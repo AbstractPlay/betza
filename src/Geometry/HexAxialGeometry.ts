@@ -25,14 +25,18 @@ export const HexAxialGeometry: Geometry = {
   resolveDirectionKeyword(keyword, sideToMove) {
     // Example mapping for hex (axial): adjust to your convention
     switch (keyword) {
-      case "f": return { dx: 0, dy: 1 };
-      case "b": return { dx: 0, dy: -1 };
-      case "l": return { dx: -1, dy: 0 };
-      case "r": return { dx: 1, dy: 0 };
+      case "f":
+        return { dx: 0, dy: 1 };
+      case "b":
+        return { dx: 0, dy: -1 };
+      case "l":
+        return { dx: -1, dy: 0 };
+      case "r":
+        return { dx: 1, dy: 0 };
       // others as needed
 
       default:
         throw new Error(`Unhandled direction keyword: ${keyword}`);
     }
-  }
+  },
 };

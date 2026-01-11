@@ -1,4 +1,9 @@
-export { GeometryId, BoardCoordinate, GeometryContext, Geometry } from "./Geometry";
+export {
+  GeometryId,
+  BoardCoordinate,
+  GeometryContext,
+  Geometry,
+} from "./Geometry";
 export { SquareRectGeometry } from "./SquareRectGeometry";
 export { HexAxialGeometry } from "./HexAxialGeometry";
 
@@ -26,12 +31,12 @@ export function classifyGeometry(symbol: string): "slide" | "leap" | "hop" {
 export function applyGeometry(
   atom: MoveAtom,
   geometry: Geometry,
-  ctx: GeometryContext
+  ctx: GeometryContext,
 ): MoveAtom {
   return {
     ...atom,
     deltasConcrete: atom.deltasAbstract.flatMap(([dx, dy]) =>
-      geometry.interpretVector(dx, dy, ctx)
+      geometry.interpretVector(dx, dy, ctx),
     ),
   };
 }

@@ -1,6 +1,6 @@
 // Identifies a geometry plugin
 export interface GeometryId {
-  readonly id: string;      // e.g. "square-rect", "hex-axial"
+  readonly id: string; // e.g. "square-rect", "hex-axial"
   readonly version: string; // semantic versioning, e.g. "1.0.0"
 }
 
@@ -24,7 +24,7 @@ export interface Geometry {
   interpretVector(
     dx: number,
     dy: number,
-    ctx: GeometryContext
+    ctx: GeometryContext,
   ): ReadonlyArray<{ df: number; dr: number }>;
 
   // Apply a delta to a coordinate, with bounds rules
@@ -32,12 +32,12 @@ export interface Geometry {
     from: BoardCoordinate,
     df: number,
     dr: number,
-    ctx: GeometryContext
+    ctx: GeometryContext,
   ): BoardCoordinate | null;
 
   // Optional: specialize direction keywords if you want (f/b/l/r etc.)
   resolveDirectionKeyword(
     keyword: "f" | "b" | "l" | "r" | "v" | "s" | "h",
-    sideToMove: "white" | "black"
+    sideToMove: "white" | "black",
   ): { dx: number; dy: number };
 }

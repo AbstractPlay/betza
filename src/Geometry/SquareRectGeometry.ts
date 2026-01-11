@@ -34,13 +34,20 @@ export const SquareRectGeometry: Geometry = {
   resolveDirectionKeyword(keyword, sideToMove) {
     const forward = sideToMove === "white" ? 1 : -1;
     switch (keyword) {
-      case "f": return { dx: 0, dy: forward };
-      case "b": return { dx: 0, dy: -forward };
-      case "l": return { dx: -1, dy: 0 };
-      case "r": return { dx: 1, dy: 0 };
-      case "v": return { dx: 0, dy: forward }; // alias of f
-      case "s": return { dx: 0, dy: -forward }; // alias of b
-      case "h": return { dx: 0, dy: 0 }; // or disallow
+      case "f":
+        return { dx: 0, dy: forward };
+      case "b":
+        return { dx: 0, dy: -forward };
+      case "l":
+        return { dx: -1, dy: 0 };
+      case "r":
+        return { dx: 1, dy: 0 };
+      case "v":
+        return { dx: 0, dy: forward }; // alias of f
+      case "s":
+        return { dx: 0, dy: -forward }; // alias of b
+      case "h":
+        return { dx: 0, dy: 0 }; // or disallow
     }
-  }
+  },
 };
