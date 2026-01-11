@@ -16,7 +16,7 @@ export class Piece {
   constructor(
     id: string,
     xbetza: string,
-    ctx: GeometryContext,
+    ctx: GeometryContext = {boardHeight: 8, boardWidth: 8},
     geometry: Geometry = SquareRectGeometry,
   ) {
     this.id = id;

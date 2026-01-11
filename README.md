@@ -17,9 +17,9 @@ yarn add @abstractplay/xbetza
 ## Quick Start
 
 ```ts
-import { parseXBetza, generateMoves } from "@abstractplay/xbetza";
+import { Piece, RectBoard, generateMoves } from "@abstractplay/xbetza";
 
-const board = boardFromGrid([
+const board = new RectBoard([
   ".....",
   ".....",
   "..F..",
@@ -27,17 +27,15 @@ const board = boardFromGrid([
   ".....",
 ]);
 
-const piece = parseXBetza("N"); // Knight
-const moves = generateMoves(piece, 2, 2, board);
+const knight = new Piece("knight", "N", board.geometryContext);
+const moves = generateMoves(knight, 2, 2, board);
 
 console.log(moves);
 // → [ [ 3, 4 ], [ 4, 3 ], [ 4, 1 ], [ 3, 0 ], [ 1, 0 ], [ 0, 1 ], [ 0, 3 ], [ 1, 4 ] ]
 ```
 
-That’s the entire workflow:
-
 - Build a board
-- Parse an XBetza string
+- Create a piece (some geometry context is required)
 - Generate moves from a coordinate
 
 ## Board Representation
@@ -81,14 +79,26 @@ As long as it implements `get(x,y)`, the engine will work.
 
 ## Parsing XBetza
 
-Use `parseXBetza` to convert a Betza string into a piece definition:
+Use the `Piece` class to convert a Betza string into a geometry-aware piece definition:
 
 ```ts
-const rook = parseXBetza("R");
-const nightrider = parseXBetza("RN");
-const grasshopper = parseXBetza("gR");
-const takeAndContinueRook = parseXBetza("tR");
+import { Piece, HexAxialGeometry } from "@abstractplay/xbetza";
+
+const rook = new Piece("sqrook", "R");
+const rookHex = new Piece("hexrook", "R", {boardWidth: 20, boardHeight: 20}, HexAxialGeometry);
+const grasshopper = new Piece("grasshopper", "gR");
+const hexTakeAndContinueRook = new Piece("hextrrook", "tR", {boardWidth: 20, boardHeight: 20}, HexAxialGeometry);
 ```
+
+By default the `Piece` constructor assumes an 8x8 chessboard. But you can override this by passing at least an appropriate context and a custom geometry if necessary. The library includes the basic square/rect and hex axial geometries.
+
+Geometry affects:
+
+- how deltas are interpreted
+- how many directions exist
+- how slides propagate
+- how hops and leaps are resolved
+- how directional modifiers (f, b, l, r) behave
 
 The parser returns a PieceDefinition containing:
 
@@ -111,10 +121,21 @@ Returns an array of [x, y] coordinates.
 Example:
 
 ```ts
-const piece = parseXBetza("tR"); // take-and-continue rook
+import { Piece, RectBoard, generateMoves } from "../src";
+const board = new RectBoard([
+    "........",
+    "........",
+    "........",
+    "........",
+    "........",
+    "........",
+    "........",
+    "........",
+]);
+const piece = new Piece("trrook", "tR"); // take-and-continue rook on standard 8x8 chessboard
 const moves = generateMoves(piece, 4, 4, board);
-
-moves.forEach(([x, y]) => console.log(x, y));
+console.log(moves);
+// -> [ [ 5, 4 ], [ 6, 4 ], [ 7, 4 ], [ 3, 4 ], [ 2, 4 ], [ 1, 4 ], [ 0, 4 ], [ 4, 5 ], [ 4, 6 ], [ 4, 7 ], [ 4, 3 ], [ 4, 2 ], [ 4, 1 ], [ 4, 0 ] ]
 ```
 
 ## Supported Movement Types (Atoms)
@@ -185,175 +206,9 @@ Legend:
 - ⚠️ conditionally meaningful (depends on range, hop, or capture rules)
 - — not meaningful for that atom type
 
-## Examples
+## Documentation
 
-### Knight
-
-```ts
-const knight = parseXBetza("N");
-generateMoves(knight, 4, 4, board);
-```
-
-### Nightrider
-
-```ts
-const nr = parseXBetza("RN");
-generateMoves(nr, 4, 4, board);
-```
-
-### Grasshopper
-
-```ts
-const g = parseXBetza("gR");
-generateMoves(g, 4, 4, board);
-```
-
-### Locust
-
-```ts
-const locust = parseXBetza("hR");
-generateMoves(locust, 4, 4, board);
-```
-
-### Take‑and‑Continue Rook
-
-```ts
-const tR = parseXBetza("tR");
-generateMoves(tR, 4, 4, board);
-```
-
-### Capture‑Then‑Leap Knight
-
-```ts
-const yN = parseXBetza("yN");
-generateMoves(yN, 4, 4, board);
-```
-
-## Geometry Support
-
-The engine supports multiple board geometries.
-
-By default, `parseXBetza()` assumes square geometry, but you can explicitly request others:
-
-```ts
-parseXBetza("R", { geometry: "square" });
-parseXBetza("R", { geometry: "hex" });
-```
-
-Geometry affects:
-
-- how deltas are interpreted
-- how many directions exist
-- how slides propagate
-- how hops and leaps are resolved
-- how directional modifiers (f, b, l, r) behave
-
-### Hex Geometry
-
-Hex geometry uses six primary directions instead of eight.
-The engine automatically remaps XBetza atoms into hex‑appropriate deltas.
-
-#### Example: Hex Wazir (W)
-
-```ts
-const wazirHex = parseXBetza("W", { geometry: "hex" });
-```
-
-Produces a piece with 6 orthogonal hex directions:
-
-```ts
-[+1, 0], [+1, -1], [0, -1],
-[-1, 0], [-1, +1], [0, +1]
-```
-
-#### Example: Hex Rook (R)
-
-```ts
-const rookHex = parseXBetza("R", { geometry: "hex" });
-```
-
-This becomes a hex‑rider sliding along the same 6 directions.
-
-#### Example: Hex Bishop (B)
-
-```ts
-const bishopHex = parseXBetza("B", { geometry: "hex" });
-```
-
-In hex geometry, “diagonal” movement is not the same as square boards.
-The engine maps B to the other 6 diagonal hex directions (the “off‑axes” directions).
-
-#### Example: Hex Knight (N)
-
-```ts
-const knightHex = parseXBetza("N", { geometry: "hex" });
-```
-
-Hex knights use the standard “(2,1)” axial offsets:
-
-```ts
-[+2, -1], [+1, -2], [-1, -1],
-[-2, +1], [-1, +2], [+1, +1]
-```
-
-### Generating Moves on a Hex Board
-
-You can build a hex board using axial coordinates:
-
-```ts
-const board = {
-  get(x, y) {
-    // return { kind: "empty" | "friendly" | "enemy" }
-  }
-};
-```
-
-Then:
-
-```ts
-const piece = parseXBetza("R", { geometry: "hex" });
-const moves = generateMoves(piece, 0, 0, board);
-```
-
-## Custom Pieces
-
-You can define pieces directly without XBetza:
-
-```ts
-const customPiece = {
-  atoms: [
-    {
-      type: "slide",
-      deltas: [[1,0], [-1,0], [0,1], [0,-1]],
-      maxSteps: Infinity,
-      takeAndContinue: true,
-      unblockable: false,
-      // etc...
-    }
-  ]
-};
-```
-
-Then:
-
-```ts
-generateMoves(customPiece, x, y, board);
-```
-
-## Testing
-
-The library is designed for unit testing:
-
-- Each movement type is isolated
-- Each modifier is isolated
-- The pipeline is deterministic
-
-Example:
-
-```ts
-expect(generateMoves(parseXBetza("R"), 1, 1, board))
-  .to.deep.include([1, 3]);
-```
+The `/docs` folder contains a few diagrams trying to explain the flow of things and includes a JSON file of the basic chess and fairy chess pieces with their Betza strings.
 
 ## Why Use This Library?
 

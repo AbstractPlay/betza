@@ -1,11 +1,13 @@
 import type { SquareState } from "../types";
+import type { GeometryContext } from "../Geometry";
+import { BaseBoard } from "./_base";
 
 export interface RectBoardOptions {
   wrapX?: boolean;
   wrapY?: boolean;
 }
 
-export class RectBoard {
+export class RectBoard extends BaseBoard {
   private grid: (string | SquareState[])[];
 
   private wrapX: boolean;
@@ -15,9 +17,19 @@ export class RectBoard {
     rows: (string | SquareState[])[],
     options: RectBoardOptions = {},
   ) {
+    super();
     this.grid = rows;
     this.wrapX = options.wrapX ?? false;
     this.wrapY = options.wrapY ?? false;
+  }
+
+  public get geometryContext(): GeometryContext {
+    return {
+      boardWidth: this.width,
+      boardHeight: this.height,
+      wrapFiles: this.wrapX,
+      wrapRanks: this.wrapY,
+    };
   }
 
   /**
@@ -111,12 +123,12 @@ export class RectBoard {
     }
   }
 
-  width(): number {
+  public get width(): number {
     const row = this.grid[0];
     return typeof row === "string" ? row.length : (row as SquareState[]).length;
   }
 
-  height(): number {
+  public get height(): number {
     return this.grid.length;
   }
 }

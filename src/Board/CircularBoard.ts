@@ -1,4 +1,6 @@
 import type { SquareState, SquareKind } from "../types";
+import { BaseBoard } from "./_base";
+import type { GeometryContext } from "../Geometry";
 
 export interface CircularBoardOptions {
   wrapX?: boolean;
@@ -8,7 +10,7 @@ export interface CircularBoardOptions {
   radius?: number;
 }
 
-export class CircularBoard {
+export class CircularBoard extends BaseBoard {
   private grid: (string | SquareState[])[];
 
   private wrapX: boolean;
@@ -22,6 +24,7 @@ export class CircularBoard {
     rows: (string | SquareState[])[],
     options: CircularBoardOptions = {},
   ) {
+    super();
     this.grid = rows;
 
     this.wrapX = options.wrapX ?? false;
@@ -37,6 +40,15 @@ export class CircularBoard {
     this.cy = options.centerY ?? Math.floor(h / 2);
     this.radius = options.radius ?? Math.min(w, h) / 2;
   }
+
+public get geometryContext(): GeometryContext {
+  return {
+    boardWidth: this.width,
+    boardHeight: this.height,
+    wrapFiles: this.wrapX,
+    wrapRanks: this.wrapY,
+  };
+}
 
   /**
    * Normalize coordinates according to wrapX / wrapY.
@@ -150,12 +162,12 @@ export class CircularBoard {
     }
   }
 
-  width(): number {
+  public get width(): number {
     const row = this.grid[0];
     return typeof row === "string" ? row.length : (row as SquareState[]).length;
   }
 
-  height(): number {
+  public get height(): number {
     return this.grid.length;
   }
 }

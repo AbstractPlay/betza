@@ -1,33 +1,36 @@
 import type { SquareState, SquareKind } from "../types";
+import type { GeometryContext } from "../Geometry";
+import { BaseBoard } from "./_base";
 
 export interface HexBoardOptions {
   wrapQ?: boolean;
   wrapR?: boolean;
 }
 
-export class HexBoard {
+export class HexBoard extends BaseBoard {
   private grid: Map<string, SquareState>;
-  private width: number;
-  private height: number;
+  private _width: number;
+  private _height: number;
 
   private wrapQ: boolean;
   private wrapR: boolean;
 
   constructor(rows: (string | SquareState[])[], options: HexBoardOptions = {}) {
+    super();
     this.grid = new Map();
 
     this.wrapQ = options.wrapQ ?? false;
     this.wrapR = options.wrapR ?? false;
 
-    this.height = rows.length;
-    this.width =
+    this._height = rows.length;
+    this._width =
       typeof rows[0] === "string"
         ? (rows[0] as string).length
         : (rows[0] as SquareState[]).length;
 
     // Convert rectangular input into axial coordinates
     // q = column, r = row
-    for (let r = 0; r < this.height; r++) {
+    for (let r = 0; r < this._height; r++) {
       const row = rows[r];
 
       if (typeof row === "string") {
@@ -51,6 +54,15 @@ export class HexBoard {
     return `${q},${r}`;
   }
 
+  public get geometryContext(): GeometryContext {
+  return {
+    boardWidth: this.width,
+    boardHeight: this.height,
+    wrapFiles: this.wrapQ,
+    wrapRanks: this.wrapR,
+  };
+    }
+
   /**
    * Normalize axial coordinates according to wrapQ / wrapR.
    */
@@ -59,15 +71,15 @@ export class HexBoard {
     let nr = r;
 
     if (this.wrapQ) {
-      nq = ((q % this.width) + this.width) % this.width;
+      nq = ((q % this._width) + this._width) % this._width;
     } else {
-      if (q < 0 || q >= this.width) return null;
+      if (q < 0 || q >= this._width) return null;
     }
 
     if (this.wrapR) {
-      nr = ((r % this.height) + this.height) % this.height;
+      nr = ((r % this._height) + this._height) % this._height;
     } else {
-      if (r < 0 || r >= this.height) return null;
+      if (r < 0 || r >= this._height) return null;
     }
 
     return { q: nq, r: nr };
@@ -109,11 +121,11 @@ export class HexBoard {
    * Axial hex boards have width = number of q columns,
    * height = number of r rows.
    */
-  getWidth(): number {
-    return this.width;
+  public get width(): number {
+    return this._width;
   }
 
-  getHeight(): number {
-    return this.height;
+  public get height(): number {
+    return this._height;
   }
 }
