@@ -115,30 +115,43 @@ const moves = generateMoves(piece, 4, 4, board);
 moves.forEach(([x, y]) => console.log(x, y));
 ```
 
-## Supported Movement Types
+## Supported Movement Types (Atoms)
 
-Slides
-R, B, Q, W, F, etc.
+| Atom | Name          | Step Pattern        | Type            |
+|------|---------------|----------------------|------------------|
+| W    | Wazir         | (1,0)                | Leaper          |
+| F    | Ferz          | (1,1)                | Leaper          |
+| D    | Dabbaba       | (2,0)                | Leaper          |
+| N    | Knight        | (2,1)                | Leaper          |
+| A    | Alfil         | (2,2)                | Leaper          |
+| H    | Threeleaper   | (3,0)                | Leaper          |
+| C    | Camel         | (3,1)                | Leaper          |
+| Z    | Zebra         | (3,2)                | Leaper          |
+| G    | Tripper       | (3,3)                | Leaper          |
+| R    | Rook          | W‑rider              | Rider           |
+| B    | Bishop        | F‑rider              | Rider           |
+| Q    | Queen         | R + B                | Rider           |
+| K    | King          | W + F                | Derived Leaper  |
+| M    | Mann          | W                    | Derived Leaper  |
+| S    | Squirrel      | F + D                | Derived Leaper  |
+| J    | Jumping Gen.  | D + N                | Derived Leaper  |
+| U    | Unicorn       | (3,3) rider (G‑rider)| Derived Rider   |
 
-Leaps
-N, D, A, H, etc.
+## Supported Modifiers
 
-Hops
-Grasshopper (g), Locust (h), and any custom hop‑based piece.
-
-Supported Modifiers
-| Modifier | Meaning |
-| t | take and continue |
-| u | unblockable |
-| o | must capture first |
-| x | must not capture first |
-| y | capture then leap |
-| p | requires clear path |
-| z | zig-zag |
-| g | grasshopper movement |
-| h | locust movement |
-| m | move only |
-| c | capture only |
+| Modifier | Meaning               |
+|----------|------------------------|
+| t        | take and continue      |
+| u        | unblockable            |
+| o        | must capture first     |
+| x        | must not capture first |
+| y        | capture then leap      |
+| p        | requires clear path    |
+| z        | zig‑zag                |
+| g        | grasshopper movement   |
+| h        | locust movement        |
+| m        | move only              |
+| c        | capture only           |
 
 Modifiers can be combined:
 
@@ -147,6 +160,27 @@ parseXBetza("tuR"); // unblockable take-and-continue rook
 parseXBetza("yN");  // capture-then-leap knight
 parseXBetza("pgB"); // clear-path grasshopper bishop
 ```
+
+## Atom × Modifier Compatibility Matrix
+
+| Modifier | Leapers (W,F,N,…) | Riders (R,B,Q) | Hoppers (g,h) | Notes |
+|----------|--------------------|----------------|---------------|--------|
+| t (take & continue) | ✔️ | ✔️ | ✔️ | Works for any capturing move |
+| u (unblockable) | ✔️ | ⚠️ | — | Riders only unblockable if range-limited |
+| o (must capture first) | ✔️ | ✔️ | ✔️ | Applies to any move with a capture option |
+| x (must not capture first) | ✔️ | ✔️ | ✔️ | Same as above, inverted |
+| y (capture then leap) | ✔️ | ⚠️ | — | Riders only if first step is capture |
+| p (requires clear path) | — | ✔️ | — | Only meaningful for riders |
+| z (zig‑zag) | ✔️ | ✔️ | — | Requires multi-step geometry |
+| g (grasshopper movement) | — | — | ✔️ | Converts atom into hopper |
+| h (locust movement) | — | — | ✔️ | Converts atom into hopper |
+| m (move‑only) | ✔️ | ✔️ | ✔️ | Universal |
+| c (capture‑only) | ✔️ | ✔️ | ✔️ | Universal |
+
+Legend:
+- ✔️ fully supported
+- ⚠️ conditionally meaningful (depends on range, hop, or capture rules)
+- — not meaningful for that atom type
 
 ## Examples
 
