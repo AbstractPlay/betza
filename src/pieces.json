@@ -1,0 +1,43 @@
+{
+  "pieces": [
+    { "id": "king",      "name": "King",        "xbetza": "WF" },
+    { "id": "queen",     "name": "Queen",       "xbetza": "WF" },
+    { "id": "rook",      "name": "Rook",        "xbetza": "W" },
+    { "id": "bishop",    "name": "Bishop",      "xbetza": "F" },
+    { "id": "knight",    "name": "Knight",      "xbetza": "N" },
+    { "id": "pawn",      "name": "Pawn",        "xbetza": "fmWcF" },
+
+    { "id": "wazir",     "name": "Wazir",       "xbetza": "W" },
+    { "id": "ferz",      "name": "Ferz",        "xbetza": "F" },
+    { "id": "dabbaba",   "name": "Dabbaba",     "xbetza": "D" },
+    { "id": "alfil",     "name": "Alfil",       "xbetza": "A" },
+    { "id": "elephant",  "name": "Elephant",    "xbetza": "E" },
+    { "id": "camel",     "name": "Camel",       "xbetza": "C" },
+    { "id": "zebra",     "name": "Zebra",       "xbetza": "Z" },
+    { "id": "giraffe",   "name": "Giraffe",     "xbetza": "G" },
+
+    { "id": "nightrider","name": "Nightrider",  "xbetza": "sN" },
+    { "id": "rookrider", "name": "Rookrider",   "xbetza": "sW" },
+    { "id": "bishrider", "name": "Bishrider",   "xbetza": "sF" },
+    { "id": "queenrider","name": "Queenrider",  "xbetza": "sWF" },
+
+    { "id": "amazon",    "name": "Amazon",      "xbetza": "WFN" },
+    { "id": "empress",   "name": "Empress",     "xbetza": "WN" },
+    { "id": "princess",  "name": "Princess",    "xbetza": "FN" },
+
+    { "id": "cannon",    "name": "Cannon",      "xbetza": "jW" },
+    { "id": "pao",       "name": "Pao",         "xbetza": "jW" },
+    { "id": "vao",       "name": "Vao",         "xbetza": "jF" },
+    { "id": "leo",       "name": "Leo",         "xbetza": "jWF" },
+
+    { "id": "squirrel",  "name": "Squirrel",    "xbetza": "S" },
+
+    { "id": "archbishop","name": "Archbishop",  "xbetza": "FN" },
+    { "id": "chancellor","name": "Chancellor",  "xbetza": "WN" },
+
+    { "id": "gryphon",   "name": "Gryphon",     "xbetza": "FfW" },
+    { "id": "aanca",     "name": "Aanca",       "xbetza": "WfF" },
+
+    { "id": "dragon",    "name": "Dragon",      "xbetza": "sWFN" }
+  ]
+}

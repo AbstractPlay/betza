@@ -1,0 +1,60 @@
+{
+  "name": "@abstractplay/xbetza",
+  "version": "1.0.0-beta",
+  "description": "An XBetza notation parser",
+  "main": "build/src/index.js",
+  "types": "build/src/index.d.ts",
+  "scripts": {
+    "build": "npm run json2ts && npm run build-ts && npm run lint",
+    "build-ts": "tsc && npm pack",
+    "test0": "mocha -r ts-node/register test/games/omny.test.ts",
+    "test": "mocha -r ts-node/register test/**/*.test.ts",
+    "lint": "npx eslint .",
+    "dist-dev": "rimraf dist && webpack",
+    "dist-prod": "rimraf dist && webpack --mode=production",
+    "full-dev": "npm run test && npm run build && npm run dist-dev && npm run deploy",
+    "full-prod": "npm run test && npm run build && npm run dist-prod && npm run deploy",
+    "deploy": "shx cp ./playground/playground.* ./dist && npx serverless client deploy --no-confirm --no-delete-contents && aws cloudfront create-invalidation --profile AbstractPlayProd --distribution-id E19KPZXKKYK444 --paths /*",
+    "json2ts": "npx json2ts -i src/schemas/gameinfo.json -o src/schemas/gameinfo.d.ts && npx json2ts -i src/schemas/moveresults.json -o src/schemas/moveresults.d.ts && npx json2ts -i src/games/tafl/ruleset.json -o src/games/tafl/ruleset.d.ts"
+  },
+  "repository": {
+    "type": "git",
+    "url": "AbstractPlay/xbetza"
+  },
+  "author": "Aaron Dalton <aaron@daltons.ca> (https://www.perlkonig.com/)",
+  "license": "MIT",
+  "keywords": [
+    "abstractplay",
+    "games",
+    "xbetza",
+    "chess"
+  ],
+  "devDependencies": {
+    "@eslint/js": "^9.26.0",
+    "@types/chai": "^4.3.4",
+    "@types/mocha": "^10.0.10",
+    "@types/pako": "^2.0.3",
+    "@typescript-eslint/eslint-plugin": "^8.32.0",
+    "@typescript-eslint/parser": "^8.32.0",
+    "chai": "^4.3.7",
+    "eslint": "^9.26.0",
+    "eslint-config-prettier": "^10.1.3",
+    "eslint-plugin-import": "^2.31.0",
+    "eslint-plugin-prefer-arrow": "^1.2.3",
+    "eslint-plugin-unicorn": "^59.0.1",
+    "json-schema-to-typescript": "^15.0.4",
+    "mocha": "^11.2.2",
+    "rimraf": "^5.0.1",
+    "shx": "^0.4.0",
+    "ts-loader": "^9.4.2",
+    "ts-node": "^10.9.1",
+    "tsx": "^4.7.3",
+    "typescript": "^5.8.3",
+    "typescript-eslint": "^8.32.0",
+    "webpack": "^5.78.0",
+    "webpack-cli": "^5.0.1"
+  },
+  "dependencies": {
+    "rfdc": "^1.3.0"
+  }
+}
