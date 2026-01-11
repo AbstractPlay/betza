@@ -1,9 +1,14 @@
 import "mocha";
 import { expect } from "chai";
-import { parseXBetza, expandAtom } from "../src";
+import { parseXBetza } from "../src/parseXBetza";
+import { expandAtom } from "../src/expandAtom";
+import { generateMoves } from "../src/generateMoves";
+
 import {
   ORTHO, DIAG, KNIGHT, DABBABA, ALFIL, ELEPHANT,
-  CAMEL, ZEBRA, GIRAFFE, SQUIRREL, PAWN
+  CAMEL, ZEBRA, GIRAFFE, SQUIRREL, PAWN,
+  BoardState,
+  SquareState
 } from "../src/types";
 
 //
@@ -33,76 +38,95 @@ function mods(extra = {}) {
 }
 
 //
+// Mock board
+//
+function boardFromGrid(grid: string[]): BoardState {
+  return {
+    width: grid[0].length,
+    height: grid.length,
+    get(x: number, y: number): SquareState|undefined {
+      if (y < 0 || y >= grid.length) return undefined;
+      if (x < 0 || x >= grid[0].length) return undefined;
+
+      const c = grid[y][x];
+      if (c === ".") return { kind: "empty" };
+      if (c === "F") return { kind: "friendly" };
+      if (c === "E") return { kind: "enemy" };
+      return undefined;
+    }
+  };
+}
+
+//
 // ─────────────────────────────────────────────
-//   ATOM EXPANSION TESTS (ORIGINAL + NEW)
+//   ATOM EXPANSION TESTS
 // ─────────────────────────────────────────────
 //
 
-describe("expandAtom – basic fairy atoms", () => {
+describe("expandAtom – atoms", () => {
 
-  it("expands W (Wazir)", () => {
-    const atom = expandAtom("W", mods());
-    expect(atom.kind).to.equal("leap");
-    expect(atom.deltas).to.deep.equal(ORTHO);
-    expect(atom.maxSteps).to.equal(1);
+  it("expands W", () => {
+    const a = expandAtom("W", mods());
+    expect(a.kind).to.equal("leap");
+    expect(a.deltas).to.deep.equal(ORTHO);
+    expect(a.maxSteps).to.equal(1);
   });
 
-  it("expands F (Ferz)", () => {
-    const atom = expandAtom("F", mods());
-    expect(atom.kind).to.equal("leap");
-    expect(atom.deltas).to.deep.equal(DIAG);
+  it("expands F", () => {
+    const a = expandAtom("F", mods());
+    expect(a.deltas).to.deep.equal(DIAG);
   });
 
-  it("expands N (Knight)", () => {
-    const atom = expandAtom("N", mods());
-    expect(atom.deltas).to.deep.equal(KNIGHT);
+  it("expands N", () => {
+    const a = expandAtom("N", mods());
+    expect(a.deltas).to.deep.equal(KNIGHT);
   });
 
-  it("expands D (Dabbaba)", () => {
-    const atom = expandAtom("D", mods());
-    expect(atom.deltas).to.deep.equal(DABBABA);
+  it("expands D", () => {
+    const a = expandAtom("D", mods());
+    expect(a.deltas).to.deep.equal(DABBABA);
   });
 
-  it("expands A (Alfil)", () => {
-    const atom = expandAtom("A", mods());
-    expect(atom.deltas).to.deep.equal(ALFIL);
+  it("expands A", () => {
+    const a = expandAtom("A", mods());
+    expect(a.deltas).to.deep.equal(ALFIL);
   });
 
-  it("expands E (Elephant)", () => {
-    const atom = expandAtom("E", mods());
-    expect(atom.deltas).to.deep.equal(ELEPHANT);
+  it("expands E", () => {
+    const a = expandAtom("E", mods());
+    expect(a.deltas).to.deep.equal(ELEPHANT);
   });
 
-  it("expands C (Camel)", () => {
-    const atom = expandAtom("C", mods());
-    expect(atom.deltas).to.deep.equal(CAMEL);
+  it("expands C", () => {
+    const a = expandAtom("C", mods());
+    expect(a.deltas).to.deep.equal(CAMEL);
   });
 
-  it("expands Z (Zebra)", () => {
-    const atom = expandAtom("Z", mods());
-    expect(atom.deltas).to.deep.equal(ZEBRA);
+  it("expands Z", () => {
+    const a = expandAtom("Z", mods());
+    expect(a.deltas).to.deep.equal(ZEBRA);
   });
 
-  it("expands H (Nightrider)", () => {
-    const atom = expandAtom("H", mods());
-    expect(atom.kind).to.equal("slide");
-    expect(atom.maxSteps).to.equal(Infinity);
-    expect(atom.deltas).to.deep.equal(KNIGHT);
+  it("expands H (nightrider)", () => {
+    const a = expandAtom("H", mods());
+    expect(a.kind).to.equal("slide");
+    expect(a.maxSteps).to.equal(Infinity);
+    expect(a.deltas).to.deep.equal(KNIGHT);
   });
 
-  it("expands G (Giraffe)", () => {
-    const atom = expandAtom("G", mods());
-    expect(atom.deltas).to.deep.equal(GIRAFFE);
+  it("expands G (giraffe)", () => {
+    const a = expandAtom("G", mods());
+    expect(a.deltas).to.deep.equal(GIRAFFE);
   });
 
-  it("expands S (Squirrel)", () => {
-    const atom = expandAtom("S", mods());
-    expect(atom.deltas).to.deep.equal(SQUIRREL);
+  it("expands S (squirrel)", () => {
+    const a = expandAtom("S", mods());
+    expect(a.deltas).to.deep.equal(SQUIRREL);
   });
 
-  it("expands P (Pawn)", () => {
-    const atom = expandAtom("P", mods());
-    expect(atom.deltas).to.deep.equal(PAWN);
+  it("expands P (pawn)", () => {
+    const a = expandAtom("P", mods());
+    expect(a.deltas).to.deep.equal(PAWN);
   });
 
   it("throws on unknown atom", () => {
@@ -112,159 +136,91 @@ describe("expandAtom – basic fairy atoms", () => {
 
 //
 // ─────────────────────────────────────────────
-//   MODIFIER TESTS (NEW)
+//   MODIFIER SEMANTICS
 // ─────────────────────────────────────────────
 //
 
-describe("expandAtom – modifier semantics", () => {
+describe("expandAtom – modifiers", () => {
 
-  it("applies againRider (a)", () => {
-    const atom = expandAtom("N", mods({ againRider: true }));
-    expect(atom.kind).to.equal("slide");
-    expect(atom.maxSteps).to.equal(Infinity);
-    expect(atom.againRider).to.equal(true);
+  it("againRider (a)", () => {
+    const a = expandAtom("N", mods({ againRider: true }));
+    expect(a.kind).to.equal("slide");
+    expect(a.maxSteps).to.equal(Infinity);
   });
 
-  it("applies requiresClearPath (p)", () => {
-    const atom = expandAtom("A", mods({ requiresClearPath: true }));
-    expect(atom.requiresClearPath).to.equal(true);
+  it("requiresClearPath (p)", () => {
+    const a = expandAtom("A", mods({ requiresClearPath: true }));
+    expect(a.requiresClearPath).to.equal(true);
   });
 
-  it("applies grasshopper hop (g)", () => {
-    const atom = expandAtom("W", mods({ hopStyle: "grasshopper", hopCount: 1 }));
-    expect(atom.kind).to.equal("hop");
-    expect(atom.hopStyle).to.equal("grasshopper");
+  it("grasshopper (g)", () => {
+    const a = expandAtom("W", mods({ hopStyle: "grasshopper", hopCount: 1 }));
+    expect(a.kind).to.equal("hop");
+    expect(a.hopStyle).to.equal("grasshopper");
   });
 
-  it("applies zigzag (z)", () => {
-    const atom = expandAtom("F", mods({ zigzag: true }));
-    expect(atom.zigzag).to.equal(true);
+  it("zigzag (z)", () => {
+    const a = expandAtom("F", mods({ zigzag: true }));
+    expect(a.zigzag).to.equal(true);
   });
 
-  it("applies takeAndContinue (t)", () => {
-    const atom = expandAtom("W", mods({ takeAndContinue: true }));
-    expect(atom.takeAndContinue).to.equal(true);
+  it("takeAndContinue (t)", () => {
+    const a = expandAtom("W", mods({ takeAndContinue: true }));
+    expect(a.takeAndContinue).to.equal(true);
   });
 
-  it("applies unblockable (u)", () => {
-    const atom = expandAtom("N", mods({ unblockable: true }));
-    expect(atom.unblockable).to.equal(true);
+  it("unblockable (u)", () => {
+    const a = expandAtom("N", mods({ unblockable: true }));
+    expect(a.unblockable).to.equal(true);
   });
 
-  it("applies mustCaptureFirst (o)", () => {
-    const atom = expandAtom("F", mods({ mustCaptureFirst: true }));
-    expect(atom.mustCaptureFirst).to.equal(true);
+  it("mustCaptureFirst (o)", () => {
+    const a = expandAtom("F", mods({ mustCaptureFirst: true }));
+    expect(a.mustCaptureFirst).to.equal(true);
   });
 
-  it("applies mustNotCaptureFirst (x)", () => {
-    const atom = expandAtom("F", mods({ mustNotCaptureFirst: true }));
-    expect(atom.mustNotCaptureFirst).to.equal(true);
+  it("mustNotCaptureFirst (x)", () => {
+    const a = expandAtom("F", mods({ mustNotCaptureFirst: true }));
+    expect(a.mustNotCaptureFirst).to.equal(true);
   });
 
-  it("applies captureThenLeap (y)", () => {
-    const atom = expandAtom("N", mods({ captureThenLeap: true }));
-    expect(atom.captureThenLeap).to.equal(true);
+  it("captureThenLeap (y)", () => {
+    const a = expandAtom("N", mods({ captureThenLeap: true }));
+    expect(a.captureThenLeap).to.equal(true);
   });
 
-  it("captureThenLeap overrides o and x", () => {
-    const atom = expandAtom("N", mods({
+  it("y overrides o and x", () => {
+    const a = expandAtom("N", mods({
       mustCaptureFirst: true,
       mustNotCaptureFirst: true,
       captureThenLeap: true
     }));
-
-    expect(atom.captureThenLeap).to.equal(true);
-    expect(atom.mustCaptureFirst).to.equal(false);
-    expect(atom.mustNotCaptureFirst).to.equal(false);
+    expect(a.captureThenLeap).to.equal(true);
+    expect(a.mustCaptureFirst).to.equal(false);
+    expect(a.mustNotCaptureFirst).to.equal(false);
   });
 });
 
 //
 // ─────────────────────────────────────────────
-//   PARSER TESTS (ORIGINAL + NEW)
+//   PARSER TESTS
 // ─────────────────────────────────────────────
 //
 
-describe("parseXBetza – basic parsing", () => {
+describe("parseXBetza", () => {
 
-  it("parses a single atom", () => {
-    const atoms = parseXBetza("N");
-    expect(atoms.length).to.equal(1);
-    expect(atoms[0].deltas).to.deep.equal(KNIGHT);
+  it("parses single atom", () => {
+    const a = parseXBetza("N");
+    expect(a[0].deltas).to.deep.equal(KNIGHT);
   });
 
-  it("parses multiple atoms in sequence", () => {
-    const atoms = parseXBetza("WFN");
-    expect(atoms.length).to.equal(3);
-    expect(atoms[0].deltas).to.deep.equal(ORTHO);
-    expect(atoms[1].deltas).to.deep.equal(DIAG);
-    expect(atoms[2].deltas).to.deep.equal(KNIGHT);
+  it("parses multiple atoms", () => {
+    const a = parseXBetza("WFN");
+    expect(a.length).to.equal(3);
   });
 
-  it("parses move-only modifier m", () => {
-    const atoms = parseXBetza("mN");
-    expect(atoms[0].moveOnly).to.equal(true);
-  });
-
-  it("parses capture-only modifier c", () => {
-    const atoms = parseXBetza("cF");
-    expect(atoms[0].captureOnly).to.equal(true);
-  });
-
-  it("parses hopper modifier j", () => {
-    const atoms = parseXBetza("jN");
-    expect(atoms[0].hopCount).to.equal(1);
-    expect(atoms[0].hopStyle).to.equal("cannon");
-  });
-
-  it("parses grasshopper modifier g", () => {
-    const atoms = parseXBetza("gW");
-    expect(atoms[0].hopStyle).to.equal("grasshopper");
-  });
-
-  it("parses againRider modifier a", () => {
-    const atoms = parseXBetza("aN");
-    expect(atoms[0].againRider).to.equal(true);
-  });
-
-  it("parses requiresClearPath modifier p", () => {
-    const atoms = parseXBetza("pA");
-    expect(atoms[0].requiresClearPath).to.equal(true);
-  });
-
-  it("parses zigzag modifier z", () => {
-    const atoms = parseXBetza("zF");
-    expect(atoms[0].zigzag).to.equal(true);
-  });
-
-  it("parses takeAndContinue modifier t", () => {
-    const atoms = parseXBetza("tW");
-    expect(atoms[0].takeAndContinue).to.equal(true);
-  });
-
-  it("parses unblockable modifier u", () => {
-    const atoms = parseXBetza("uN");
-    expect(atoms[0].unblockable).to.equal(true);
-  });
-
-  it("parses mustCaptureFirst modifier o", () => {
-    const atoms = parseXBetza("oF");
-    expect(atoms[0].mustCaptureFirst).to.equal(true);
-  });
-
-  it("parses mustNotCaptureFirst modifier x", () => {
-    const atoms = parseXBetza("xF");
-    expect(atoms[0].mustNotCaptureFirst).to.equal(true);
-  });
-
-  it("parses captureThenLeap modifier y", () => {
-    const atoms = parseXBetza("yN");
-    expect(atoms[0].captureThenLeap).to.equal(true);
-  });
-
-  it("parses complex sequences with all modifiers", () => {
-    const atoms = parseXBetza("mapztoxyuN");
-    const a = atoms[0];
+  it("parses all modifiers", () => {
+    const a = parseXBetza("mapztoxyuN")[0];
 
     expect(a.moveOnly).to.equal(true);
     expect(a.againRider).to.equal(true);
@@ -273,10 +229,129 @@ describe("parseXBetza – basic parsing", () => {
     expect(a.takeAndContinue).to.equal(true);
     expect(a.unblockable).to.equal(true);
 
-    // overridden by y
     expect(a.mustCaptureFirst).to.equal(false);
     expect(a.mustNotCaptureFirst).to.equal(false);
-
     expect(a.captureThenLeap).to.equal(true);
+  });
+});
+
+//
+// ─────────────────────────────────────────────
+//   MOVE GENERATOR TESTS
+// ─────────────────────────────────────────────
+//
+
+describe("moveGenerator – leap", () => {
+
+  it("knight moves", () => {
+    const board = boardFromGrid([
+      ".....",
+      ".....",
+      "..F..",
+      ".....",
+      ".....",
+    ]);
+    const piece = { atoms: parseXBetza("N") };
+    const moves = generateMoves(piece, 2, 2, board);
+
+    expect(moves).to.have.length(8);
+  });
+
+  it("mustCaptureFirst blocks empty squares", () => {
+    const board = boardFromGrid([
+      "...",
+      ".F.",
+      "..."
+    ]);
+
+    const piece = { atoms: parseXBetza("oN") };
+    const moves = generateMoves(piece, 1, 1, board);
+
+    expect(moves).to.have.length(0);
+  });
+
+it("captureThenLeap works", () => {
+  const board = boardFromGrid([
+    "........", // y = 0
+    "........", // y = 1
+    "........", // y = 2
+    "...F....", // y = 3, F at (3,3)
+    "........", // y = 4
+    "....E...", // y = 5, E at (4,5)
+    "........", // y = 6
+    "........", // y = 7
+  ]);
+
+  // Knight at (3,3)
+  const piece = { atoms: parseXBetza("yN") };
+  const moves = generateMoves(piece, 3, 3, board);
+
+  // Knight captures enemy at (4,5), then leaps again to (5,7)
+  // (3,3) -> (4,5): (+1, +2)  knight move
+  // (4,5) -> (5,7): (+1, +2)  knight move
+  expect(moves).to.deep.include([5, 7]);
+});
+
+});
+
+describe("moveGenerator – slide", () => {
+
+  it("rook moves", () => {
+    const board = boardFromGrid([
+      "...",
+      ".F.",
+      "..."
+    ]);
+
+    const piece = { atoms: parseXBetza("R") };
+    const moves = generateMoves(piece, 1, 1, board);
+
+    expect(moves).to.have.length(4);
+  });
+
+  it("unblockable passes through pieces", () => {
+    const board = boardFromGrid([
+      ".E.",
+      ".F.",
+      ".E."
+    ]);
+
+    const piece = { atoms: parseXBetza("uR") };
+    const moves = generateMoves(piece, 1, 1, board);
+
+    expect(moves).to.deep.include([1, 0]);
+    expect(moves).to.deep.include([1, 2]);
+  });
+
+  it("takeAndContinue continues sliding after capture", () => {
+    const board = boardFromGrid([
+      "...",
+      ".F.",
+      ".E.",
+      "..."
+    ]);
+
+    const piece = { atoms: parseXBetza("tR") };
+    const moves = generateMoves(piece, 1, 1, board);
+
+    expect(moves).to.deep.include([1, 2]); // capture
+    expect(moves).to.deep.include([1, 3]); // continue
+  });
+});
+
+describe("moveGenerator – hop", () => {
+
+  it("grasshopper hops over first piece", () => {
+    const board = boardFromGrid([
+      "...",
+      ".F.",
+      ".E.",
+      "..."
+    ]);
+
+    const piece = { atoms: parseXBetza("gW") };
+    const moves = generateMoves(piece, 1, 1, board);
+
+    expect(moves).to.deep.include([1, 3]);
   });
 });

@@ -98,3 +98,14 @@ export type MoveAtom = {
   mustNotCaptureFirst?: boolean; // x
   captureThenLeap?: boolean;     // y
 };
+
+export type SquareState =
+  | { kind: "empty" }
+  | { kind: "friendly"; pieceId?: string }
+  | { kind: "enemy"; pieceId?: string };
+
+export type BoardState = {
+  width: number;
+  height: number;
+  get(x: number, y: number): SquareState | undefined;
+};
