@@ -141,8 +141,8 @@ describe("RectBoard", () => {
         "...",
       ]);
 
-      expect(b.width()).to.equal(3);
-      expect(b.height()).to.equal(2);
+      expect(b.width).to.equal(3);
+      expect(b.height).to.equal(2);
     });
 
     it("returns correct dimensions for object rows", () => {
@@ -157,8 +157,8 @@ describe("RectBoard", () => {
         ]
       ]);
 
-      expect(b.width()).to.equal(2);
-      expect(b.height()).to.equal(2);
+      expect(b.width).to.equal(2);
+      expect(b.height).to.equal(2);
     });
   });
 

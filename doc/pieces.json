@@ -1,43 +1,43 @@
 {
   "pieces": [
-    { "id": "king",       "xbetza": "WF" },
-    { "id": "queen",      "xbetza": "WF" },
-    { "id": "rook",       "xbetza": "W" },
-    { "id": "bishop",     "xbetza": "F" },
-    { "id": "knight",     "xbetza": "N" },
-    { "id": "pawn",       "xbetza": "fmWcF" },
+    { "id": "king",       "betza": "WF" },
+    { "id": "queen",      "betza": "WF" },
+    { "id": "rook",       "betza": "W" },
+    { "id": "bishop",     "betza": "F" },
+    { "id": "knight",     "betza": "N" },
+    { "id": "pawn",       "betza": "fmWcF" },
 
-    { "id": "wazir",      "xbetza": "W" },
-    { "id": "ferz",       "xbetza": "F" },
-    { "id": "dabbaba",    "xbetza": "D" },
-    { "id": "alfil",      "xbetza": "A" },
-    { "id": "elephant",   "xbetza": "E" },
-    { "id": "camel",      "xbetza": "C" },
-    { "id": "zebra",      "xbetza": "Z" },
-    { "id": "giraffe",    "xbetza": "G" },
+    { "id": "wazir",      "betza": "W" },
+    { "id": "ferz",       "betza": "F" },
+    { "id": "dabbaba",    "betza": "D" },
+    { "id": "alfil",      "betza": "A" },
+    { "id": "elephant",   "betza": "E" },
+    { "id": "camel",      "betza": "C" },
+    { "id": "zebra",      "betza": "Z" },
+    { "id": "giraffe",    "betza": "G" },
 
-    { "id": "nightrider", "xbetza": "sN" },
-    { "id": "rookrider",  "xbetza": "sW" },
-    { "id": "bishrider",  "xbetza": "sF" },
-    { "id": "queenrider", "xbetza": "sWF" },
+    { "id": "nightrider", "betza": "sN" },
+    { "id": "rookrider",  "betza": "sW" },
+    { "id": "bishrider",  "betza": "sF" },
+    { "id": "queenrider", "betza": "sWF" },
 
-    { "id": "amazon",     "xbetza": "WFN" },
-    { "id": "empress",    "xbetza": "WN" },
-    { "id": "princess",   "xbetza": "FN" },
+    { "id": "amazon",     "betza": "WFN" },
+    { "id": "empress",    "betza": "WN" },
+    { "id": "princess",   "betza": "FN" },
 
-    { "id": "cannon",     "xbetza": "jW" },
-    { "id": "pao",        "xbetza": "jW" },
-    { "id": "vao",        "xbetza": "jF" },
-    { "id": "leo",        "xbetza": "jWF" },
+    { "id": "cannon",     "betza": "jW" },
+    { "id": "pao",        "betza": "jW" },
+    { "id": "vao",        "betza": "jF" },
+    { "id": "leo",        "betza": "jWF" },
 
-    { "id": "squirrel",   "xbetza": "S" },
+    { "id": "squirrel",   "betza": "S" },
 
-    { "id": "archbishop", "xbetza": "FN" },
-    { "id": "chancellor", "xbetza": "WN" },
+    { "id": "archbishop", "betza": "FN" },
+    { "id": "chancellor", "betza": "WN" },
 
-    { "id": "gryphon",    "xbetza": "FfW" },
-    { "id": "aanca",      "xbetza": "WfF" },
+    { "id": "gryphon",    "betza": "FfW" },
+    { "id": "aanca",      "betza": "WfF" },
 
-    { "id": "dragon",     "xbetza": "sWFN" }
+    { "id": "dragon",     "betza": "sWFN" }
   ]
 }

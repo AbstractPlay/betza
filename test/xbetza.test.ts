@@ -1,6 +1,6 @@
 import "mocha";
 import { expect } from "chai";
-import { parseXBetza } from "../src/Piece/parseXBetza";
+import { parseBetza } from "../src/Piece/parseBetza";
 import { expandAtom } from "../src/Piece/expandAtom";
 import { generateMoves } from "../src/generateMoves";
 import { classifyGeometry, DIRECTION_MAP } from "../src/Geometry";
@@ -213,20 +213,20 @@ describe("expandAtom – modifiers", () => {
 // ─────────────────────────────────────────────
 //
 
-describe("parseXBetza", () => {
+describe("parseBetza", () => {
 
   it("parses single atom", () => {
-    const a = parseXBetza("N");
+    const a = parseBetza("N");
     expect(a[0].deltasAbstract).to.deep.equal(DIRECTION_MAP["N"]);
   });
 
   it("parses multiple atoms", () => {
-    const a = parseXBetza("WFN");
+    const a = parseBetza("WFN");
     expect(a.length).to.equal(3);
   });
 
   it("parses all modifiers", () => {
-    const a = parseXBetza("mapztoxyuN")[0];
+    const a = parseBetza("mapztoxyuN")[0];
 
     expect(a.moveOnly).to.equal(true);
     expect(a.againRider).to.equal(true);
@@ -241,19 +241,19 @@ describe("parseXBetza", () => {
   });
 
   it("geometry: parser correctly assigns slide geometry", () => {
-    const a = parseXBetza("R")[0];
+    const a = parseBetza("R")[0];
     expect(a.kind).to.equal("slide");
     expect(a.maxSteps).to.equal(Infinity);
   });
 
   it("geometry: parser correctly assigns leap geometry", () => {
-    const a = parseXBetza("N")[0];
+    const a = parseBetza("N")[0];
     expect(a.kind).to.equal("leap");
     expect(a.maxSteps).to.equal(1);
   });
 
   it("geometry: parser correctly assigns hop geometry via prefix", () => {
-    const a = parseXBetza("gR")[0];
+    const a = parseBetza("gR")[0];
     expect(a.kind).to.equal("hop");
     expect(a.hopStyle).to.equal("grasshopper");
   });

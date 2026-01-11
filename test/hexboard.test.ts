@@ -146,8 +146,8 @@ describe("HexBoard", () => {
         ]
       );
 
-      expect(b.getWidth()).to.equal(3);
-      expect(b.getHeight()).to.equal(3);
+      expect(b.width).to.equal(3);
+      expect(b.height).to.equal(3);
     });
   });
 

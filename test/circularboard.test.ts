@@ -198,8 +198,8 @@ describe("CircularBoard", () => {
         { radius: 3 }
       );
 
-      expect(b.width()).to.equal(3);
-      expect(b.height()).to.equal(3);
+      expect(b.width).to.equal(3);
+      expect(b.height).to.equal(3);
     });
   });
 

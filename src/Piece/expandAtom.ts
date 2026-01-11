@@ -23,7 +23,7 @@ export function expandAtom(
   },
 ): MoveAtom {
   if (!(atom in DIRECTION_MAP)) {
-    throw new Error(`Unknown XBetza atom: ${atom}`);
+    throw new Error(`Unknown Betza atom: ${atom}`);
   }
 
   //

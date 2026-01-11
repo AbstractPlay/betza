@@ -1,23 +1,23 @@
-# XBetza Move Generator
+# Betza Move Generator
 
-A TypeScript library for generating legal moves for chess and fairy‑chess pieces using XBetza notation. If you want to define custom pieces, support variants, or build a move engine with extensible movement rules, this library gives you a clean, predictable API.
+A TypeScript library for generating legal moves for chess and fairy‑chess pieces using Betza notation. If you want to define custom pieces, support variants, or build a move engine with extensible movement rules, this library gives you a clean, predictable API.
 
 ## Installation
 
 ```bash
-npm install @abstractplay/xbetza
+npm install @abstractplay/betza
 ```
 
 or
 
 ```bash
-yarn add @abstractplay/xbetza
+yarn add @abstractplay/betza
 ```
 
 ## Quick Start
 
 ```ts
-import { Piece, RectBoard, generateMoves } from "@abstractplay/xbetza";
+import { Piece, RectBoard, generateMoves } from "@abstractplay/betza";
 
 const board = new RectBoard([
   ".....",
@@ -77,12 +77,12 @@ class MyBoard {
 
 As long as it implements `get(x,y)`, the engine will work.
 
-## Parsing XBetza
+## Parsing Betza
 
 Use the `Piece` class to convert a Betza string into a geometry-aware piece definition:
 
 ```ts
-import { Piece, HexAxialGeometry } from "@abstractplay/xbetza";
+import { Piece, HexAxialGeometry } from "@abstractplay/betza";
 
 const rook = new Piece("sqrook", "R");
 const rookHex = new Piece("hexrook", "R", {boardWidth: 20, boardHeight: 20}, HexAxialGeometry);
@@ -179,9 +179,9 @@ console.log(moves);
 Modifiers can be combined:
 
 ```ts
-parseXBetza("tuR"); // unblockable take-and-continue rook
-parseXBetza("yN");  // capture-then-leap knight
-parseXBetza("pgB"); // clear-path grasshopper bishop
+parseBetza("tuR"); // unblockable take-and-continue rook
+parseBetza("yN");  // capture-then-leap knight
+parseBetza("pgB"); // clear-path grasshopper bishop
 ```
 
 ## Atom × Modifier Compatibility Matrix
@@ -216,4 +216,4 @@ The `/docs` folder contains a few diagrams trying to explain the flow of things 
 - You want deterministic, auditable movement rules
 - You want to avoid hand‑coding movement logic
 - You want a clean, extensible architecture
-- You want full XBetza support without the headaches
+- You want full Betza support without the headaches

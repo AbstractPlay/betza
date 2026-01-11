@@ -1,7 +1,7 @@
 {
-  "name": "@abstractplay/xbetza",
+  "name": "@abstractplay/betza",
   "version": "1.0.0-beta",
-  "description": "An XBetza notation parser",
+  "description": "A Betza notation parser",
   "main": "build/src/index.js",
   "types": "build/src/index.d.ts",
   "scripts": {
@@ -15,14 +15,14 @@
   },
   "repository": {
     "type": "git",
-    "url": "AbstractPlay/xbetza"
+    "url": "AbstractPlay/betza"
   },
   "author": "Aaron Dalton <aaron@daltons.ca> (https://www.perlkonig.com/)",
   "license": "MIT",
   "keywords": [
     "abstractplay",
     "games",
-    "xbetza",
+    "betza",
     "chess"
   ],
   "devDependencies": {

@@ -4,25 +4,25 @@ import {
   type Geometry,
   type GeometryContext,
 } from "../Geometry";
-import { parseXBetza } from "./parseXBetza";
+import { parseBetza } from "./parseBetza";
 import { SquareRectGeometry } from "../Geometry";
 
 export class Piece {
   public readonly id: string;
-  public readonly xbetza: string;
+  public readonly betza: string;
   public readonly geometry: Geometry;
   public atoms: MoveAtom[];
 
   constructor(
     id: string,
-    xbetza: string,
+    betza: string,
     ctx: GeometryContext = { boardHeight: 8, boardWidth: 8 },
     geometry: Geometry = SquareRectGeometry,
   ) {
     this.id = id;
-    this.xbetza = xbetza;
+    this.betza = betza;
     this.geometry = geometry;
-    const normalized = parseXBetza(xbetza);
+    const normalized = parseBetza(betza);
     this.atoms = normalized.map((atom) => applyGeometry(atom, geometry, ctx));
   }
 }
