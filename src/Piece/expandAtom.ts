@@ -1,5 +1,5 @@
 import type { Direction, MoveAtom } from "../types";
-import { classifyGeometry, DIRECTION_MAP } from "../Geometry"; // you already have these
+import { classifyGeometry, DIRECTION_MAP } from "../Geometry";
 
 export function expandAtom(
   atom: string,
@@ -10,27 +10,22 @@ export function expandAtom(
     directionsRestricted: boolean;
     allowedDirections?: Direction[];
 
-    requiresClearPath: boolean; // p
-    againRider: boolean; // a
-    hopStyle?: "cannon" | "grasshopper"; // g or h
+    requiresClearPath: boolean;
+    againRider: boolean;
+    hopStyle?: "cannon" | "grasshopper" | "locust";
 
-    zigzag: boolean; // z
-    takeAndContinue: boolean; // t
-    unblockable: boolean; // u
-    mustCaptureFirst: boolean; // o
-    mustNotCaptureFirst: boolean; // x
-    captureThenLeap: boolean; // y
+    zigzag: boolean;
+    takeAndContinue: boolean;
+    unblockable: boolean;
+    mustCaptureFirst: boolean;
+    mustNotCaptureFirst: boolean;
+    captureThenLeap: boolean;
   },
 ): MoveAtom {
   if (!(atom in DIRECTION_MAP)) {
     throw new Error(`Unknown Betza atom: ${atom}`);
   }
 
-  //
-  // ─────────────────────────────────────────────
-  //   BASE MOVEATOM (all fields initialized)
-  // ─────────────────────────────────────────────
-  //
   const base: MoveAtom = {
     kind: classifyGeometry(atom),
     deltasAbstract: DIRECTION_MAP[atom] ?? [],
@@ -56,26 +51,22 @@ export function expandAtom(
     captureThenLeap: mods.captureThenLeap,
   };
 
-  //
-  // ─────────────────────────────────────────────
-  //   APPLY MODIFIER SEMANTICS
-  // ─────────────────────────────────────────────
-  //
-
-  // a = againRider → riderize leaper
   if (mods.againRider) {
     base.kind = "slide";
     base.maxSteps = Infinity;
   }
 
-  // g/h = grasshopper/locust hop
-  if (mods.hopStyle === "grasshopper") {
+  if (mods.hopStyle === "grasshopper" || mods.hopStyle === "locust") {
     base.kind = "hop";
-    base.hopCount = 1;
-    base.hopStyle = "grasshopper";
+    base.hopCount = mods.hopCount || 1;
+    base.hopStyle = mods.hopStyle;
   }
 
-  // y = capture-then-leap overrides o and x
+  if (mods.hopStyle === "cannon") {
+    base.hopCount = mods.hopCount;
+    base.hopStyle = "cannon";
+  }
+
   if (mods.captureThenLeap) {
     base.mustCaptureFirst = false;
     base.mustNotCaptureFirst = false;

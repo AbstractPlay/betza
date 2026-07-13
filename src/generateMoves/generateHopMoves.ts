@@ -1,5 +1,9 @@
 import type { MoveAtom, BoardState, PathSquare } from "../types";
 import { handleCaptureThenLeap } from ".";
+import {
+  countPiecesOnLine,
+  filterDeltasByDirections,
+} from "./utils";
 
 export function generateHopMoves(
   atom: MoveAtom,
@@ -8,12 +12,29 @@ export function generateHopMoves(
   board: BoardState,
   out: Array<[number, number]>,
 ) {
-  if (!atom.deltasConcrete) return; // geometry not applied
+  if (!atom.deltasConcrete) return;
 
-  for (const { df, dr } of atom.deltasConcrete) {
+  const deltas = filterDeltasByDirections(
+    atom.deltasConcrete,
+    atom.directionsRestricted ? atom.allowedDirections : undefined,
+  );
+
+  for (const { df, dr } of deltas) {
     const ray = buildHopRayDirection(atom, x, y, df, dr, board);
     const annotated = annotateHopRay(ray, board);
     let landing = handleHopLogic(annotated, atom, board, df, dr);
+
+    if (atom.hopStyle === "cannon" && atom.hopCount > 0) {
+      landing = landing.filter(
+        (sq) => countPiecesOnLine(x, y, sq.x, sq.y, board) === atom.hopCount,
+      );
+    }
+
+    if (atom.requiresClearPath) {
+      landing = landing.filter(
+        (sq) => countPiecesOnLine(x, y, sq.x, sq.y, board) === 0,
+      );
+    }
 
     if (atom.captureThenLeap) {
       landing = handleCaptureThenLeap(landing, atom, board);
@@ -38,7 +59,7 @@ function buildHopRayDirection(
     const nx = x + df * step;
     const ny = y + dr * step;
 
-    if (!board.get(nx, ny)) break; // off board
+    if (!board.get(nx, ny)) break;
 
     ray.push([nx, ny]);
     step++;
@@ -61,18 +82,27 @@ function handleHopLogic(
   df: number,
   dr: number,
 ): PathSquare[] {
-  // 1. Find the hurdle
+  if (atom.hopStyle === "locust") {
+    const hurdle = path.find((sq) => sq.sq?.kind === "enemy");
+    if (!hurdle) return [];
+
+    const lx = hurdle.x + df;
+    const ly = hurdle.y + dr;
+    const landingSq = board.get(lx, ly);
+    if (!landingSq) return [];
+    if (landingSq.kind !== "empty") return [];
+    if (atom.captureOnly) return [];
+    return [{ x: lx, y: ly, sq: landingSq }];
+  }
+
   const hurdle = path.find((sq) => sq.sq && sq.sq.kind !== "empty");
   if (!hurdle) return [];
 
-  // 2. Landing square is one step beyond the hurdle
   const lx = hurdle.x + df;
   const ly = hurdle.y + dr;
-
   const landingSq = board.get(lx, ly);
-  if (!landingSq) return []; // off board
+  if (!landingSq) return [];
 
-  // 3. Apply capture/move restrictions
   if (landingSq.kind === "friendly") return [];
 
   if (landingSq.kind === "empty") {

@@ -18,7 +18,8 @@ export function classifyGeometry(symbol: string): "slide" | "leap" | "hop" {
   if (/^[WF]$/.test(symbol)) return "leap";
 
   // Leapers
-  if (/^[NDAECZGS]$/.test(symbol)) return "leap"; // H removed from this group
+  if (/^[NDAECZGS]$/.test(symbol)) return "leap";
+  if (/^[KMJ]$/.test(symbol)) return "leap";
 
   // Hoppers
   if (/^[gh]$/.test(symbol)) return "hop";
@@ -163,9 +164,41 @@ export const DIRECTION_MAP: Record<string, Array<Direction>> = {
   ],
 
   // Pawn (forward-only step)
-  P: [[0, 1]], // your tests expect this
+  P: [[0, 1]],
 
-  // Nightrider (slide‑knight)
+  // Derived leapers
+  K: [
+    [1, 0],
+    [-1, 0],
+    [0, 1],
+    [0, -1],
+    [1, 1],
+    [1, -1],
+    [-1, 1],
+    [-1, -1],
+  ],
+  M: [
+    [1, 0],
+    [-1, 0],
+    [0, 1],
+    [0, -1],
+  ],
+  J: [
+    [0, 2],
+    [2, 0],
+    [0, -2],
+    [-2, 0],
+    [1, 2],
+    [2, 1],
+    [2, -1],
+    [1, -2],
+    [-1, -2],
+    [-2, -1],
+    [-2, 1],
+    [-1, 2],
+  ],
+
+  // Nightrider (slide-knight)
   H: [
     [1, 2],
     [2, 1],

@@ -1,6 +1,7 @@
 import { generateHopMoves } from "./generateHopMoves";
 import { generateLeapMoves } from "./generateLeapMoves";
 import { generateSlideMoves } from "./generateSlideMoves";
+import { dedupeMoves } from "./utils";
 
 import type { MoveAtom, BoardState, PathSquare } from "../types";
 
@@ -28,7 +29,7 @@ export function generateMoves(
     }
   }
 
-  return results;
+  return dedupeMoves(results);
 }
 
 export function handleCaptureThenLeap(
@@ -38,13 +39,11 @@ export function handleCaptureThenLeap(
 ): PathSquare[] {
   if (!atom.deltasConcrete) return [];
 
-  // 1. Find the first enemy square in the path
   const capture = path.find((sq) => sq.sq?.kind === "enemy");
   if (!capture) return [];
 
   const results: PathSquare[] = [];
 
-  // 2. From the capture square, perform a normal leap using concrete deltas
   for (const { df, dr } of atom.deltasConcrete) {
     const nx = capture.x + df;
     const ny = capture.y + dr;

@@ -1,5 +1,9 @@
 import type { MoveAtom, BoardState, PathSquare } from "../types";
 import { handleCaptureThenLeap } from ".";
+import {
+  countPiecesOnLine,
+  filterDeltasByDirections,
+} from "./utils";
 
 export function generateSlideMoves(
   atom: MoveAtom,
@@ -8,44 +12,87 @@ export function generateSlideMoves(
   board: BoardState,
   out: Array<[number, number]>,
 ) {
-  if (!atom.deltasConcrete) return; // geometry not applied
+  if (!atom.deltasConcrete) return;
 
-  const path = buildRay(atom, x, y, board);
-  let annotated = annotateRay(path, board);
+  const deltas = filterDeltasByDirections(
+    atom.deltasConcrete,
+    atom.directionsRestricted ? atom.allowedDirections : undefined,
+  );
 
-  annotated = applyUnblockable(annotated, atom);
-  annotated = applyRequiresClearPath(annotated, atom);
-  annotated = applyCaptureRules(annotated, atom, board);
+  for (const { df, dr } of deltas) {
+    const path = atom.zigzag
+      ? buildZigzagRayDirection(atom, x, y, df, dr, board)
+      : buildRayDirection(atom, x, y, df, dr, board);
+    let annotated = annotateRay(path, board);
 
-  if (atom.takeAndContinue) {
-    annotated = handleTakeAndContinue(annotated);
+    annotated = applyRequiresClearPath(annotated, atom);
+    annotated = applyCannonRules(annotated, atom, x, y, board);
+    annotated = applyCaptureRules(annotated, atom, board);
+
+    if (atom.takeAndContinue) {
+      annotated = handleTakeAndContinue(annotated);
+    }
+
+    const moves = emitMoves(annotated, atom);
+    out.push(...moves);
   }
-
-  const moves = emitMoves(annotated, atom);
-  out.push(...moves);
 }
 
-function buildRay(
+function buildRayDirection(
   atom: MoveAtom,
   x: number,
   y: number,
+  df: number,
+  dr: number,
   board: BoardState,
 ): Array<[number, number]> {
   const ray: Array<[number, number]> = [];
+  let step = 1;
 
-  for (const { df, dr } of atom.deltasConcrete!) {
-    let step = 1;
+  while (step <= atom.maxSteps) {
+    const nx = x + df * step;
+    const ny = y + dr * step;
 
-    while (step <= atom.maxSteps) {
-      const nx = x + df * step;
-      const ny = y + dr * step;
+    if (!board.get(nx, ny)) break;
 
-      // stop when leaving the board
-      if (!board.get(nx, ny)) break;
+    ray.push([nx, ny]);
+    step++;
+  }
 
-      ray.push([nx, ny]);
-      step++;
-    }
+  return ray;
+}
+
+function buildZigzagRayDirection(
+  atom: MoveAtom,
+  x: number,
+  y: number,
+  startDf: number,
+  startDr: number,
+  board: BoardState,
+): Array<[number, number]> {
+  const ray: Array<[number, number]> = [];
+  const visited = new Set<string>();
+  let df = startDf;
+  let dr = startDr;
+  let cx = x;
+  let cy = y;
+  let step = 1;
+  const maxSteps = Number.isFinite(atom.maxSteps)
+    ? atom.maxSteps
+    : board.width + board.height;
+
+  while (step <= maxSteps) {
+    cx += df;
+    cy += dr;
+
+    const key = `${cx},${cy}`;
+    const sq = board.get(cx, cy);
+    if (!sq || visited.has(key)) break;
+
+    visited.add(key);
+    ray.push([cx, cy]);
+    [df, dr] = [-dr, df];
+    step++;
   }
 
   return ray;
@@ -56,11 +103,6 @@ function annotateRay(
   board: BoardState,
 ): PathSquare[] {
   return ray.map(([x, y]) => ({ x, y, sq: board.get(x, y) }));
-}
-
-function applyUnblockable(path: PathSquare[], atom: MoveAtom): PathSquare[] {
-  if (!atom.unblockable) return path;
-  return path; // nothing blocks, so no filtering
 }
 
 function applyRequiresClearPath(
@@ -75,6 +117,21 @@ function applyRequiresClearPath(
     out.push(sq);
   }
   return out;
+}
+
+function applyCannonRules(
+  path: PathSquare[],
+  atom: MoveAtom,
+  x: number,
+  y: number,
+  board: BoardState,
+): PathSquare[] {
+  if (atom.hopStyle !== "cannon" || atom.hopCount <= 0) return path;
+
+  return path.filter((sq) => {
+    const hurdles = countPiecesOnLine(x, y, sq.x, sq.y, board);
+    return hurdles === atom.hopCount;
+  });
 }
 
 function applyCaptureRules(
@@ -98,16 +155,14 @@ function handleTakeAndContinue(path: PathSquare[]): PathSquare[] {
   const out: PathSquare[] = [];
 
   for (const sq of path) {
-    if (!sq.sq) break; // off board
+    if (!sq.sq) break;
     if (sq.sq.kind === "friendly") break;
 
-    out.push(sq); // empty or enemy both legal
+    out.push(sq);
 
     if (sq.sq.kind === "enemy") {
-      continue; // capture → keep sliding
+      continue;
     }
-
-    // empty → keep sliding
   }
 
   return out;
@@ -120,53 +175,36 @@ function emitMoves(
   const out: Array<[number, number]> = [];
 
   for (const sq of path) {
-    if (!sq.sq) break; // off board
+    if (!sq.sq) break;
 
-    // ─────────────────────────────────────────────
-    // EMPTY SQUARE
-    // ─────────────────────────────────────────────
     if (sq.sq.kind === "empty") {
       if (!atom.captureOnly && !atom.mustCaptureFirst) {
         out.push([sq.x, sq.y]);
       }
-      // empty never blocks
       continue;
     }
 
-    // ─────────────────────────────────────────────
-    // ENEMY SQUARE
-    // ─────────────────────────────────────────────
     if (sq.sq.kind === "enemy") {
       if (!atom.moveOnly && !atom.mustNotCaptureFirst) {
         out.push([sq.x, sq.y]);
       }
 
-      // take‑and‑continue: DO NOT STOP
       if (atom.takeAndContinue) {
         continue;
       }
 
-      // unblockable: DO NOT STOP
       if (atom.unblockable) {
         continue;
       }
 
-      // normal slider: stop after capture
       break;
     }
 
-    // ─────────────────────────────────────────────
-    // FRIENDLY SQUARE
-    // ─────────────────────────────────────────────
     if (sq.sq.kind === "friendly") {
-      // cannot land on friendly
-
-      // unblockable: skip but continue
       if (atom.unblockable) {
         continue;
       }
 
-      // normal slider: blocked
       break;
     }
   }

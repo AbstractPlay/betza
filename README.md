@@ -147,18 +147,21 @@ console.log(moves);
 | D    | Dabbaba       | (2,0)                | Leaper          |
 | N    | Knight        | (2,1)                | Leaper          |
 | A    | Alfil         | (2,2)                | Leaper          |
-| H    | Threeleaper   | (3,0)                | Leaper          |
 | C    | Camel         | (3,1)                | Leaper          |
 | Z    | Zebra         | (3,2)                | Leaper          |
-| G    | Tripper       | (3,3)                | Leaper          |
+| G    | Giraffe       | (1,4)                | Leaper          |
+| E    | Elephant      | F + D                | Leaper          |
+| S    | Squirrel      | mixed 1–2 squares    | Leaper          |
+| P    | Pawn          | (0,1)                | Leaper          |
+| H    | Nightrider    | N‑rider              | Rider           |
 | R    | Rook          | W‑rider              | Rider           |
 | B    | Bishop        | F‑rider              | Rider           |
 | Q    | Queen         | R + B                | Rider           |
 | K    | King          | W + F                | Derived Leaper  |
 | M    | Mann          | W                    | Derived Leaper  |
-| S    | Squirrel      | F + D                | Derived Leaper  |
 | J    | Jumping Gen.  | D + N                | Derived Leaper  |
-| U    | Unicorn       | (3,3) rider (G‑rider)| Derived Rider   |
+
+Series riders use the `s` or `a` prefix (e.g. `sN` nightrider, `aN` again-rider).
 
 ## Supported Modifiers
 
@@ -173,6 +176,9 @@ console.log(moves);
 | z        | zig‑zag                |
 | g        | grasshopper movement   |
 | h        | locust movement        |
+| j        | cannon (hurdle count)  |
+| s / a    | series rider           |
+| f/b/l/r  | directional restrict   |
 | m        | move only              |
 | c        | capture only           |
 
@@ -188,15 +194,18 @@ parseBetza("pgB"); // clear-path grasshopper bishop
 
 | Modifier                   | Leapers (W,F,N,…)  | Riders (R,B,Q) | Hoppers (g,h) | Notes  |
 |----------------------------|--------------------|----------------|---------------|--------|
-| t (take & continue) | ✔️ | ✔️ | ✔️ | Works for any capturing move |
-| u (unblockable) | ✔️ | ⚠️ | — | Riders only unblockable if range-limited |
+| t (take & continue) | ✔️ | ✔️ | — | Leapers continue sliding after capture |
+| u (unblockable) | ✔️ | ✔️ | — | Passes through blockers on slides |
 | o (must capture first) | ✔️ | ✔️ | ✔️ | Applies to any move with a capture option |
 | x (must not capture first) | ✔️ | ✔️ | ✔️ | Same as above, inverted |
-| y (capture then leap) | ✔️ | ⚠️ | — | Riders only if first step is capture |
-| p (requires clear path) | — | ✔️ | — | Only meaningful for riders |
-| z (zig‑zag) | ✔️ | ✔️ | — | Requires multi-step geometry |
+| y (capture then leap) | ✔️ | ✔️ | ✔️ | Per-ray on slides |
+| p (requires clear path) | ✔️ | ✔️ | ✔️ | All intervening squares must be empty |
+| z (zig‑zag) | — | ✔️ | — | Alternates direction each step |
 | g (grasshopper movement) | — | — | ✔️ | Converts atom into hopper |
-| h (locust movement) | — | — | ✔️ | Converts atom into hopper |
+| h (locust movement) | — | — | ✔️ | Enemy hurdle, empty landing beyond |
+| j (cannon) | ✔️ | ✔️ | ✔️ | Requires exact hurdle count on path |
+| s / a (series rider) | ✔️ | ✔️ | — | Riderizes leaper atoms |
+| f/b/l/r (directional) | ✔️ | ✔️ | ✔️ | Restricts to forward/back/left/right |
 | m (move‑only) | ✔️ | ✔️ | ✔️ | Universal |
 | c (capture‑only) | ✔️ | ✔️ | ✔️ | Universal |
 
@@ -208,7 +217,9 @@ Legend:
 
 ## Documentation
 
-The `/docs` folder contains a few diagrams trying to explain the flow of things and includes a JSON file of the basic chess and fairy chess pieces with their Betza strings.
+The `/doc` folder contains a few diagrams trying to explain the flow of things and includes a JSON file of the basic chess and fairy chess pieces with their Betza strings.
+
+When creating pieces for a specific board, pass `board.geometryContext` to the `Piece` constructor so geometry matches the board dimensions.
 
 ## Why Use This Library?
 

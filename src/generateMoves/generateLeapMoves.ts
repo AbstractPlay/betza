@@ -1,5 +1,10 @@
 import type { MoveAtom, BoardState, PathSquare } from "../types";
 import { handleCaptureThenLeap } from ".";
+import { generateSlideMoves } from "./generateSlideMoves";
+import {
+  countPiecesOnLine,
+  filterDeltasByDirections,
+} from "./utils";
 
 export function generateLeapMoves(
   atom: MoveAtom,
@@ -8,20 +13,36 @@ export function generateLeapMoves(
   board: BoardState,
   out: Array<[number, number]>,
 ) {
-  if (!atom.deltasConcrete) return; // geometry not applied
+  if (!atom.deltasConcrete) return;
 
-  const targets = buildLeapTargets(atom, x, y);
+  const deltas = filterDeltasByDirections(
+    atom.deltasConcrete,
+    atom.directionsRestricted ? atom.allowedDirections : undefined,
+  );
+
+  const targets = deltas.map(({ df, dr }) => [x + df, y + dr] as [number, number]);
   let annotated = annotateLeapTargets(targets, board);
+  annotated = applyLeapCannon(annotated, atom, x, y, board);
+  annotated = applyLeapClearPath(annotated, atom, x, y, board);
   annotated = applyLeapModifiers(annotated, atom, board);
-  out.push(...emitLeapMoves(annotated));
-}
 
-function buildLeapTargets(
-  atom: MoveAtom,
-  x: number,
-  y: number,
-): Array<[number, number]> {
-  return atom.deltasConcrete!.map(({ df, dr }) => [x + df, y + dr]);
+  for (const sq of annotated) {
+    out.push([sq.x, sq.y]);
+
+    if (atom.takeAndContinue && sq.sq?.kind === "enemy") {
+      const slideAtom: MoveAtom = {
+        ...atom,
+        kind: "slide",
+        maxSteps: Infinity,
+        takeAndContinue: true,
+        captureThenLeap: false,
+        mustCaptureFirst: false,
+        mustNotCaptureFirst: false,
+        deltasConcrete: deltas,
+      };
+      generateSlideMoves(slideAtom, sq.x, sq.y, board, out);
+    }
+  }
 }
 
 function annotateLeapTargets(
@@ -31,20 +52,47 @@ function annotateLeapTargets(
   return targets.map(([x, y]) => ({ x, y, sq: board.get(x, y) }));
 }
 
+function applyLeapCannon(
+  path: PathSquare[],
+  atom: MoveAtom,
+  x: number,
+  y: number,
+  board: BoardState,
+): PathSquare[] {
+  if (atom.hopStyle !== "cannon" || atom.hopCount <= 0) return path;
+
+  return path.filter((sq) => {
+    const hurdles = countPiecesOnLine(x, y, sq.x, sq.y, board);
+    return hurdles === atom.hopCount;
+  });
+}
+
+function applyLeapClearPath(
+  path: PathSquare[],
+  atom: MoveAtom,
+  x: number,
+  y: number,
+  board: BoardState,
+): PathSquare[] {
+  if (!atom.requiresClearPath) return path;
+
+  return path.filter((sq) => countPiecesOnLine(x, y, sq.x, sq.y, board) === 0);
+}
+
 function applyLeapModifiers(
   path: PathSquare[],
   atom: MoveAtom,
   board: BoardState,
 ): PathSquare[] {
-  // capture-then-leap overrides everything
   if (atom.captureThenLeap) {
     return handleCaptureThenLeap(path, atom, board);
   }
 
   return path.filter((sq) => {
-    if (!sq.sq) return false; // off board
+    if (!sq.sq) return false;
 
-    if (sq.sq.kind === "friendly") return false;
+    if (sq.sq.kind === "friendly" && !atom.unblockable) return false;
+    if (sq.sq.kind === "friendly" && atom.unblockable) return false;
 
     if (sq.sq.kind === "empty") {
       if (atom.captureOnly) return false;
@@ -60,8 +108,4 @@ function applyLeapModifiers(
 
     return false;
   });
-}
-
-function emitLeapMoves(path: PathSquare[]): Array<[number, number]> {
-  return path.map((sq) => [sq.x, sq.y]);
 }

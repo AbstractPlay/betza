@@ -22,7 +22,7 @@ export type MoveAtom = {
   maxSteps: number; // ∞ for slides, 1 for leaps, 1 for hops
 
   hopCount: number; // 0 = normal, 1 = grasshopper/locust, >1 = cannon
-  hopStyle?: "cannon" | "grasshopper";
+  hopStyle?: "cannon" | "grasshopper" | "locust";
 
   moveOnly: boolean; // m
   captureOnly: boolean; // c

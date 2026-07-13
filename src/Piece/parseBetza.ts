@@ -1,7 +1,53 @@
 import type { MoveAtom, Direction } from "../types";
 import { expandAtom } from "./expandAtom";
 
+const DIRECTION_SETS: Record<string, Direction[]> = {
+  f: [
+    [0, 1],
+    [1, 1],
+    [-1, 1],
+  ],
+  b: [
+    [0, -1],
+    [1, -1],
+    [-1, -1],
+  ],
+  l: [
+    [-1, 0],
+    [-1, 1],
+    [-1, -1],
+  ],
+  r: [
+    [1, 0],
+    [1, 1],
+    [1, -1],
+  ],
+};
+
+function mergeDirections(
+  existing: Direction[] | undefined,
+  next: Direction[],
+): Direction[] {
+  const seen = new Set<string>();
+  const merged: Direction[] = [];
+
+  for (const dirs of [existing ?? [], next]) {
+    for (const d of dirs) {
+      const key = `${d[0]},${d[1]}`;
+      if (seen.has(key)) continue;
+      seen.add(key);
+      merged.push(d);
+    }
+  }
+
+  return merged;
+}
+
 export function parseBetza(x: string): MoveAtom[] {
+  if (x.length === 0) {
+    throw new Error("Empty Betza string");
+  }
+
   const atoms: MoveAtom[] = [];
   let i = 0;
 
@@ -13,27 +59,20 @@ export function parseBetza(x: string): MoveAtom[] {
     let directionsRestricted = false;
     let allowedDirections: Direction[] | undefined = undefined;
 
-    let requiresClearPath = false; // p
-    let againRider = false; // a
-    let hopStyle: "cannon" | "grasshopper" | undefined = undefined;
+    let requiresClearPath = false;
+    let againRider = false;
+    let hopStyle: "cannon" | "grasshopper" | "locust" | undefined = undefined;
 
-    // NEW modifiers
-    let zigzag = false; // z
-    let takeAndContinue = false; // t
-    let unblockable = false; // u
-    let mustCaptureFirst = false; // o
-    let mustNotCaptureFirst = false; // x
-    let captureThenLeap = false; // y
+    let zigzag = false;
+    let takeAndContinue = false;
+    let unblockable = false;
+    let mustCaptureFirst = false;
+    let mustNotCaptureFirst = false;
+    let captureThenLeap = false;
 
-    //
-    // ─────────────────────────────────────────────
-    //   PREFIX MODIFIERS
-    // ─────────────────────────────────────────────
-    //
     while (i < x.length) {
       const c = x[i];
 
-      // Basic
       if (c === "m") {
         moveOnly = true;
         i++;
@@ -45,7 +84,6 @@ export function parseBetza(x: string): MoveAtom[] {
         continue;
       }
 
-      // Hoppers
       if (c === "j") {
         hopCount++;
         hopStyle = "cannon";
@@ -58,20 +96,24 @@ export function parseBetza(x: string): MoveAtom[] {
         i++;
         continue;
       }
+      if (c === "h") {
+        hopCount = 1;
+        hopStyle = "locust";
+        i++;
+        continue;
+      }
 
-      // Path / rider modifiers
       if (c === "p") {
         requiresClearPath = true;
         i++;
         continue;
       }
-      if (c === "a") {
+      if (c === "a" || c === "s") {
         againRider = true;
         i++;
         continue;
       }
 
-      // NEW modifiers
       if (c === "z") {
         zigzag = true;
         i++;
@@ -103,44 +145,12 @@ export function parseBetza(x: string): MoveAtom[] {
         continue;
       }
 
-      // Directional
-      if (c === "f") {
+      if (c in DIRECTION_SETS) {
         directionsRestricted = true;
-        allowedDirections = [
-          [0, 1],
-          [1, 1],
-          [-1, 1],
-        ];
-        i++;
-        continue;
-      }
-      if (c === "b") {
-        directionsRestricted = true;
-        allowedDirections = [
-          [0, -1],
-          [1, -1],
-          [-1, -1],
-        ];
-        i++;
-        continue;
-      }
-      if (c === "l") {
-        directionsRestricted = true;
-        allowedDirections = [
-          [-1, 0],
-          [-1, 1],
-          [-1, -1],
-        ];
-        i++;
-        continue;
-      }
-      if (c === "r") {
-        directionsRestricted = true;
-        allowedDirections = [
-          [1, 0],
-          [1, 1],
-          [1, -1],
-        ];
+        allowedDirections = mergeDirections(
+          allowedDirections,
+          DIRECTION_SETS[c],
+        );
         i++;
         continue;
       }
@@ -148,11 +158,6 @@ export function parseBetza(x: string): MoveAtom[] {
       break;
     }
 
-    //
-    // ─────────────────────────────────────────────
-    //   ATOM CHARACTER
-    // ─────────────────────────────────────────────
-    //
     if (i >= x.length) {
       throw new Error("Unexpected end of Betza string");
     }

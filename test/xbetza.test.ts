@@ -87,7 +87,7 @@ describe("expandAtom – atoms", () => {
     const a = expandAtom("H", mods());
     expect(a.kind).to.equal("slide");
     expect(a.maxSteps).to.equal(Infinity);
-    expect(a.deltasAbstract).to.deep.equal(DIRECTION_MAP["N"]);
+    expect(a.deltasAbstract).to.deep.equal(DIRECTION_MAP["H"]);
   });
 
   it("expands G (giraffe)", () => {
@@ -135,6 +135,18 @@ describe("expandAtom – atoms", () => {
 //
 
 describe("expandAtom – modifiers", () => {
+
+  it("locust (h)", () => {
+    const a = expandAtom("R", mods({ hopStyle: "locust" }));
+    expect(a.kind).to.equal("hop");
+    expect(a.hopStyle).to.equal("locust");
+  });
+
+  it("series rider (s) via parseBetza", () => {
+    const atoms = parseBetza("sN");
+    expect(atoms[0].againRider).to.equal(true);
+    expect(atoms[0].kind).to.equal("slide");
+  });
 
   it("againRider (a)", () => {
     const a = expandAtom("N", mods({ againRider: true }));
@@ -338,6 +350,43 @@ describe("moveGenerator – leap", () => {
 
 describe("moveGenerator – slide", () => {
 
+  it("stops at enemy in one direction but moves in others", () => {
+    const board = boardFromGrid([
+      ".....",
+      ".....",
+      "..F..",
+      "..E..",
+      ".....",
+    ]);
+
+    const piece = new Piece("R", "R", squareCtx);
+    const moves = generateMoves(piece, 2, 2, board);
+
+    expect(moves).to.deep.include([2, 3]);
+    expect(moves).to.deep.include([2, 1]);
+    expect(moves).to.deep.include([1, 2]);
+    expect(moves).to.deep.include([3, 2]);
+    expect(moves).to.not.deep.include([2, 4]);
+  });
+
+  it("normal rook stops at first enemy per ray", () => {
+    const board = boardFromGrid([
+      ".....",
+      "..E..",
+      "..F..",
+      "..E..",
+      ".....",
+    ]);
+
+    const piece = new Piece("R", "R", squareCtx);
+    const moves = generateMoves(piece, 2, 2, board);
+
+    expect(moves).to.deep.include([2, 1]);
+    expect(moves).to.deep.include([2, 3]);
+    expect(moves).to.not.deep.include([2, 0]);
+    expect(moves).to.not.deep.include([2, 4]);
+  });
+
   it("rook moves", () => {
     const board = boardFromGrid([
       "...",
@@ -472,8 +521,8 @@ it("classifies H (nightrider) as slide", () => {
     expect(classifyGeometry("h")).to.equal("hop");
   });
 
-  it("lowercase = hop, uppercase = leap fallback", () => {
-    expect(classifyGeometry("x")).to.equal("hop");
+  it("lowercase unknown atoms classify as hop", () => {
+    expect(classifyGeometry("q")).to.equal("hop");
     expect(classifyGeometry("Z")).to.equal("leap");
   });
 });
@@ -499,7 +548,8 @@ describe("geometry – DIRECTION_MAP", () => {
     expect(DIRECTION_MAP["B"]).to.deep.include([-1, -1]);
   });
 
-  it("unknown symbols fall back to empty array", () => {
-    expect(DIRECTION_MAP["?"] ?? []).to.deep.equal([]);
+  it("unknown symbols are not in DIRECTION_MAP", () => {
+    expect("?" in DIRECTION_MAP).to.equal(false);
+    expect(() => expandAtom("?", mods())).to.throw();
   });
 });
