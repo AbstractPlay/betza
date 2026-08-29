@@ -114,8 +114,9 @@ function applyRequiresClearPath(
 
   const out: PathSquare[] = [];
   for (const sq of path) {
-    if (!sq.sq || sq.sq.kind !== "empty") break;
+    if (!sq.sq) break;
     out.push(sq);
+    if (sq.sq.kind !== "empty") break;
   }
   return out;
 }
@@ -142,12 +143,6 @@ function applyCaptureRules(
 ): PathSquare[] {
   if (atom.captureThenLeap) {
     return handleCaptureThenLeap(path, atom, board);
-  }
-  if (atom.mustCaptureFirst) {
-    return path.filter((s) => s.sq?.kind === "enemy");
-  }
-  if (atom.mustNotCaptureFirst) {
-    return path.filter((s) => s.sq?.kind === "empty");
   }
   return path;
 }
