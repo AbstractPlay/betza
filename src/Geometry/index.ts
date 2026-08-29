@@ -12,13 +12,13 @@ import { GeometryContext, Geometry } from "./Geometry";
 
 export function classifyGeometry(symbol: string): "slide" | "leap" | "hop" {
   // Sliding pieces
-  if (/^[RBQH]$/.test(symbol)) return "slide"; // ← H added here
+  if (/^[RBQ]$/.test(symbol)) return "slide";
 
   // Steppers (1‑square moves)
   if (/^[WF]$/.test(symbol)) return "leap";
 
   // Leapers
-  if (/^[NDAECZGS]$/.test(symbol)) return "leap";
+  if (/^[NDAECZGHS]$/.test(symbol)) return "leap";
   if (/^[KMJ]$/.test(symbol)) return "leap";
 
   // Hoppers
@@ -144,6 +144,12 @@ export const DIRECTION_MAP: Record<string, Array<Direction>> = {
     [-4, 1],
     [-1, 4],
   ],
+  H: [
+    [0, 3],
+    [3, 0],
+    [0, -3],
+    [-3, 0],
+  ], // threeleaper
   S: [
     [1, 1],
     [1, 2],
@@ -192,18 +198,6 @@ export const DIRECTION_MAP: Record<string, Array<Direction>> = {
     [2, 1],
     [2, -1],
     [1, -2],
-    [-1, -2],
-    [-2, -1],
-    [-2, 1],
-    [-1, 2],
-  ],
-
-  // Nightrider (slide-knight)
-  H: [
-    [1, 2],
-    [2, 1],
-    [2, -1],
-    [1, -2], // knight deltas
     [-1, -2],
     [-2, -1],
     [-2, 1],

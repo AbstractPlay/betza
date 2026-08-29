@@ -70,7 +70,7 @@ describe("moveGen – modifiers", () => {
     expect(moves).to.deep.equal([[1, 2]]);
   });
 
-  it("series rider (sN) slides like nightrider", () => {
+  it("series rider (aN) slides like nightrider", () => {
     const board = boardFromGrid([
       "........",
       "........",
@@ -81,7 +81,7 @@ describe("moveGen – modifiers", () => {
       "........",
       "........",
     ]);
-    const piece = new Piece("sN", "sN", squareCtx);
+    const piece = new Piece("aN", "aN", squareCtx);
     const moves = generateMoves(piece, 4, 3, board);
     expect(moves).to.deep.include([6, 4]);
     expect(moves).to.deep.include([5, 5]);

@@ -108,7 +108,7 @@ export function parseBetza(x: string): MoveAtom[] {
         i++;
         continue;
       }
-      if (c === "a" || c === "s") {
+      if (c === "a") {
         againRider = true;
         i++;
         continue;

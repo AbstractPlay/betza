@@ -15,11 +15,12 @@
     { "id": "camel", "betza": "C" },
     { "id": "zebra", "betza": "Z" },
     { "id": "giraffe", "betza": "G" },
+    { "id": "threeleaper", "betza": "H" },
 
-    { "id": "nightrider", "betza": "sN" },
-    { "id": "rookrider", "betza": "sR" },
-    { "id": "bishrider", "betza": "sB" },
-    { "id": "queenrider", "betza": "sQ" },
+    { "id": "nightrider", "betza": "aN" },
+    { "id": "rookrider", "betza": "aR" },
+    { "id": "bishrider", "betza": "aB" },
+    { "id": "queenrider", "betza": "aQ" },
 
     { "id": "amazon", "betza": "WFN" },
     { "id": "empress", "betza": "WN" },
@@ -42,6 +43,6 @@
 
     { "id": "grasshopper-rook", "betza": "gR" },
     { "id": "locust-rook", "betza": "hR" },
-    { "id": "dragon", "betza": "sWFN" }
+    { "id": "dragon", "betza": "aWFN" }
   ]
 }

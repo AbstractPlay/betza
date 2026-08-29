@@ -83,15 +83,21 @@ describe("expandAtom – atoms", () => {
     expect(a.deltasAbstract).to.deep.equal(DIRECTION_MAP["Z"]);
   });
 
-  it("expands H (nightrider)", () => {
+  it("expands H (threeleaper)", () => {
     const a = expandAtom("H", mods());
-    expect(a.kind).to.equal("slide");
-    expect(a.maxSteps).to.equal(Infinity);
-    expect(a.deltasAbstract).to.deep.equal(DIRECTION_MAP["H"]);
+    expect(a.kind).to.equal("leap");
+    expect(a.maxSteps).to.equal(1);
+    expect(a.deltasAbstract).to.deep.equal([
+      [0, 3],
+      [3, 0],
+      [0, -3],
+      [-3, 0],
+    ]);
   });
 
   it("expands G (giraffe)", () => {
     const a = expandAtom("G", mods());
+    expect(a.kind).to.equal("leap");
     expect(a.deltasAbstract).to.deep.equal(DIRECTION_MAP["G"]);
   });
 
@@ -142,8 +148,8 @@ describe("expandAtom – modifiers", () => {
     expect(a.hopStyle).to.equal("locust");
   });
 
-  it("series rider (s) via parseBetza", () => {
-    const atoms = parseBetza("sN");
+  it("series rider (a) via parseBetza", () => {
+    const atoms = parseBetza("aN");
     expect(atoms[0].againRider).to.equal(true);
     expect(atoms[0].kind).to.equal("slide");
   });
@@ -488,11 +494,10 @@ describe("moveGenerator – hop", () => {
 
 describe("geometry – classifyGeometry", () => {
 
-it("classifies slides: R B Q H", () => {
+it("classifies slides: R B Q", () => {
   expect(classifyGeometry("R")).to.equal("slide");
   expect(classifyGeometry("B")).to.equal("slide");
   expect(classifyGeometry("Q")).to.equal("slide");
-  expect(classifyGeometry("H")).to.equal("slide"); // nightrider
 });
 
 it("classifies steppers (W, F) as leaps", () => {
@@ -512,8 +517,8 @@ it("classifies leaps: N D A E C Z G S P", () => {
   expect(classifyGeometry("P")).to.equal("leap");
 });
 
-it("classifies H (nightrider) as slide", () => {
-  expect(classifyGeometry("H")).to.equal("slide");
+it("classifies H (threeleaper) as a leap", () => {
+  expect(classifyGeometry("H")).to.equal("leap");
 });
 
   it("classifies hops: g h", () => {
