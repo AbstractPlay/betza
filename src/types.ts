@@ -32,6 +32,7 @@ export type MoveAtom = {
   directionalModifiers?: string; // f/b/l/r/v/s
 
   requiresClearPath: boolean; // p
+  nonJumping?: boolean; // n
   againRider: boolean; // a
 
   zigzag?: boolean; // z

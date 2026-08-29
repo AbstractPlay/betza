@@ -11,6 +11,7 @@ export function expandAtom(
     range?: number;
 
     requiresClearPath: boolean;
+    nonJumping?: boolean;
     againRider: boolean;
     hopStyle?: "cannon" | "grasshopper" | "locust";
 
@@ -41,6 +42,7 @@ export function expandAtom(
     directionalModifiers: mods.directionalModifiers,
 
     requiresClearPath: mods.requiresClearPath,
+    nonJumping: mods.nonJumping,
     againRider: mods.againRider,
 
     zigzag: mods.zigzag,

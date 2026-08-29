@@ -173,6 +173,7 @@ Series riders use the `a` prefix (e.g. `aN` nightrider, or again-rider).
 | x        | must not capture first |
 | y        | capture then leap      |
 | p        | requires clear path    |
+| n        | blockable leap         |
 | z        | zig‑zag                |
 | g        | grasshopper movement   |
 | h        | locust movement        |
@@ -200,6 +201,7 @@ parseBetza("pgB"); // clear-path grasshopper bishop
 | x (must not capture first) | ✔️ | ✔️ | ✔️ | Same as above, inverted |
 | y (capture then leap) | ✔️ | ✔️ | ✔️ | Per-ray on slides |
 | p (requires clear path) | ✔️ | ✔️ | ✔️ | All intervening squares must be empty |
+| n (blockable leap) | ✔️ | — | — | Stopped by anything on the squares the leap passes over |
 | z (zig‑zag) | — | ✔️ | — | Alternates direction each step |
 | g (grasshopper movement) | — | — | ✔️ | Converts atom into hopper |
 | h (locust movement) | — | — | ✔️ | Enemy hurdle, empty landing beyond |

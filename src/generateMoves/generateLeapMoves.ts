@@ -1,7 +1,7 @@
 import type { MoveAtom, BoardState, PathSquare } from "../types";
 import { handleCaptureThenLeap } from ".";
 import { generateSlideMoves } from "./generateSlideMoves";
-import { countPiecesOnLine } from "./utils";
+import { countPiecesOnLeapPath, countPiecesOnLine } from "./utils";
 
 export function generateLeapMoves(
   atom: MoveAtom,
@@ -68,6 +68,11 @@ function applyLeapClearPath(
   y: number,
   board: BoardState,
 ): PathSquare[] {
+  if (atom.nonJumping) {
+    return path.filter(
+      (sq) => countPiecesOnLeapPath(x, y, sq.x, sq.y, board) === 0,
+    );
+  }
   if (!atom.requiresClearPath) return path;
 
   return path.filter((sq) => countPiecesOnLine(x, y, sq.x, sq.y, board) === 0);

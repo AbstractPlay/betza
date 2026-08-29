@@ -19,6 +19,7 @@ export function parseBetza(x: string): MoveAtom[] {
     let directionalModifiers = "";
 
     let requiresClearPath = false;
+    let nonJumping = false;
     let againRider = false;
     let hopStyle: "cannon" | "grasshopper" | "locust" | undefined = undefined;
 
@@ -64,6 +65,11 @@ export function parseBetza(x: string): MoveAtom[] {
 
       if (c === "p") {
         requiresClearPath = true;
+        i++;
+        continue;
+      }
+      if (c === "n") {
+        nonJumping = true;
         i++;
         continue;
       }
@@ -135,6 +141,7 @@ export function parseBetza(x: string): MoveAtom[] {
       directionalModifiers: directionalModifiers || undefined,
       range,
       requiresClearPath,
+      nonJumping,
       againRider,
       hopStyle,
 
