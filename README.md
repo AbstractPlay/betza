@@ -150,10 +150,10 @@ console.log(moves);
 | C    | Camel         | (3,1)                | Leaper          |
 | Z    | Zebra         | (3,2)                | Leaper          |
 | G    | Giraffe       | (1,4)                | Leaper          |
+| H    | Threeleaper   | (3,0)                | Leaper          |
 | E    | Elephant      | F + D                | Leaper          |
 | S    | Squirrel      | mixed 1–2 squares    | Leaper          |
 | P    | Pawn          | (0,1)                | Leaper          |
-| H    | Nightrider    | N‑rider              | Rider           |
 | R    | Rook          | W‑rider              | Rider           |
 | B    | Bishop        | F‑rider              | Rider           |
 | Q    | Queen         | R + B                | Rider           |
@@ -161,7 +161,7 @@ console.log(moves);
 | M    | Mann          | W                    | Derived Leaper  |
 | J    | Jumping Gen.  | D + N                | Derived Leaper  |
 
-Series riders use the `s` or `a` prefix (e.g. `sN` nightrider, `aN` again-rider).
+Series riders use the `a` prefix (e.g. `aN` nightrider, or again-rider).
 
 ## Supported Modifiers
 
@@ -173,12 +173,13 @@ Series riders use the `s` or `a` prefix (e.g. `sN` nightrider, `aN` again-rider)
 | x        | must not capture first |
 | y        | capture then leap      |
 | p        | requires clear path    |
+| n        | blockable leap         |
 | z        | zig‑zag                |
 | g        | grasshopper movement   |
 | h        | locust movement        |
 | j        | cannon (hurdle count)  |
-| s / a    | series rider           |
-| f/b/l/r  | directional restrict   |
+| a        | series rider           |
+| f/b/l/r/v/s | directional restrict |
 | m        | move only              |
 | c        | capture only           |
 
@@ -200,12 +201,13 @@ parseBetza("pgB"); // clear-path grasshopper bishop
 | x (must not capture first) | ✔️ | ✔️ | ✔️ | Same as above, inverted |
 | y (capture then leap) | ✔️ | ✔️ | ✔️ | Per-ray on slides |
 | p (requires clear path) | ✔️ | ✔️ | ✔️ | All intervening squares must be empty |
-| z (zig‑zag) | — | ✔️ | — | Alternates direction each step |
+| n (blockable leap) | ✔️ | — | — | Stopped by anything on the squares the leap passes over |
+| z (zig‑zag) | — | ✔️ | — | Alternates direction each step; square boards only |
 | g (grasshopper movement) | — | — | ✔️ | Converts atom into hopper |
 | h (locust movement) | — | — | ✔️ | Enemy hurdle, empty landing beyond |
 | j (cannon) | ✔️ | ✔️ | ✔️ | Requires exact hurdle count on path |
-| s / a (series rider) | ✔️ | ✔️ | — | Riderizes leaper atoms |
-| f/b/l/r (directional) | ✔️ | ✔️ | ✔️ | Restricts to forward/back/left/right |
+| a (series rider) | ✔️ | ✔️ | — | Riderizes leaper atoms |
+| f/b/l/r/v/s (directional) | ✔️ | ✔️ | ✔️ | Half-plane, quadrant, or narrowed axis |
 | m (move‑only) | ✔️ | ✔️ | ✔️ | Universal |
 | c (capture‑only) | ✔️ | ✔️ | ✔️ | Universal |
 

@@ -1,4 +1,4 @@
-import type { Direction, MoveAtom } from "../types";
+import type { MoveAtom } from "../types";
 import { classifyGeometry, DIRECTION_MAP } from "../Geometry";
 
 export function expandAtom(
@@ -7,10 +7,11 @@ export function expandAtom(
     moveOnly: boolean;
     captureOnly: boolean;
     hopCount: number;
-    directionsRestricted: boolean;
-    allowedDirections?: Direction[];
+    directionalModifiers?: string;
+    range?: number;
 
     requiresClearPath: boolean;
+    nonJumping?: boolean;
     againRider: boolean;
     hopStyle?: "cannon" | "grasshopper" | "locust";
 
@@ -27,6 +28,7 @@ export function expandAtom(
   }
 
   const base: MoveAtom = {
+    atom,
     kind: classifyGeometry(atom),
     deltasAbstract: DIRECTION_MAP[atom] ?? [],
     maxSteps: classifyGeometry(atom) === "slide" ? Infinity : 1,
@@ -37,10 +39,10 @@ export function expandAtom(
     moveOnly: mods.moveOnly,
     captureOnly: mods.captureOnly,
 
-    directionsRestricted: mods.directionsRestricted,
-    allowedDirections: mods.allowedDirections,
+    directionalModifiers: mods.directionalModifiers,
 
     requiresClearPath: mods.requiresClearPath,
+    nonJumping: mods.nonJumping,
     againRider: mods.againRider,
 
     zigzag: mods.zigzag,
@@ -54,6 +56,11 @@ export function expandAtom(
   if (mods.againRider) {
     base.kind = "slide";
     base.maxSteps = Infinity;
+  }
+
+  if (mods.range !== undefined) {
+    base.kind = "slide";
+    base.maxSteps = mods.range;
   }
 
   if (mods.hopStyle === "grasshopper" || mods.hopStyle === "locust") {

@@ -20,10 +20,10 @@ export interface GeometryContext {
 export interface Geometry {
   readonly meta: GeometryId;
 
-  // Map “Betza vector” to one or more concrete deltas in this geometry
-  interpretVector(
-    dx: number,
-    dy: number,
+  // Resolve one Betza atom into this board's native directions
+  atomDeltas(
+    atom: string,
+    canonical: ReadonlyArray<readonly [number, number]>,
     ctx: GeometryContext,
   ): ReadonlyArray<{ df: number; dr: number }>;
 
@@ -35,9 +35,9 @@ export interface Geometry {
     ctx: GeometryContext,
   ): BoardCoordinate | null;
 
-  // Optional: specialize direction keywords if you want (f/b/l/r etc.)
-  resolveDirectionKeyword(
-    keyword: "f" | "b" | "l" | "r" | "v" | "s" | "h",
-    sideToMove: "white" | "black",
-  ): { dx: number; dy: number };
+  // Optional: narrows deltas down to the direction modifiers (f/b/l/r/v/s)
+  selectDirections?(
+    deltas: ReadonlyArray<{ df: number; dr: number }>,
+    modifiers: string,
+  ): ReadonlyArray<{ df: number; dr: number }>;
 }

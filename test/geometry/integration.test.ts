@@ -9,8 +9,6 @@ const modsNone = {
   moveOnly: false,
   captureOnly: false,
   hopCount: 0,
-  directionsRestricted: false,
-  allowedDirections: undefined,
   requiresClearPath: false,
   againRider: false,
   hopStyle: undefined,
@@ -87,14 +85,8 @@ describe("Geometry Integration", () => {
 
         // Expected axial hex‑knight offsets
         const expected = [
-            [4 + 2, 4 + 1],
-            [4 + 2, 4 - 1],
-            [4 - 2, 4 + 1],
-            [4 - 2, 4 - 1],
-            [4 + 1, 4 + 2],
-            [4 + 1, 4 - 2],
-            [4 - 1, 4 + 2],
-            [4 - 1, 4 - 2],
+            [5, 6], [6, 5], [7, 3], [7, 2], [6, 1], [5, 1],
+            [3, 2], [2, 3], [1, 5], [1, 6], [2, 7], [3, 7],
         ];
 
         expect(moves).to.have.deep.members(expected);

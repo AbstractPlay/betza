@@ -4,6 +4,7 @@ import {
   type Geometry,
   type GeometryContext,
 } from "../Geometry";
+import type { Side } from "../types";
 import { parseBetza } from "./parseBetza";
 import { SquareRectGeometry } from "../Geometry";
 
@@ -18,11 +19,14 @@ export class Piece {
     betza: string,
     ctx: GeometryContext = { boardHeight: 8, boardWidth: 8 },
     geometry: Geometry = SquareRectGeometry,
+    side: Side = "white",
   ) {
     this.id = id;
     this.betza = betza;
     this.geometry = geometry;
     const normalized = parseBetza(betza);
-    this.atoms = normalized.map((atom) => applyGeometry(atom, geometry, ctx));
+    this.atoms = normalized.map((atom) =>
+      applyGeometry(atom, geometry, ctx, side),
+    );
   }
 }

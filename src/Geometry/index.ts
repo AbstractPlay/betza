@@ -7,18 +7,18 @@ export {
 export { SquareRectGeometry } from "./SquareRectGeometry";
 export { HexAxialGeometry } from "./HexAxialGeometry";
 
-import type { Direction, MoveAtom } from "../types";
+import type { Direction, MoveAtom, Side } from "../types";
 import { GeometryContext, Geometry } from "./Geometry";
 
 export function classifyGeometry(symbol: string): "slide" | "leap" | "hop" {
   // Sliding pieces
-  if (/^[RBQH]$/.test(symbol)) return "slide"; // ← H added here
+  if (/^[RBQ]$/.test(symbol)) return "slide";
 
   // Steppers (1‑square moves)
   if (/^[WF]$/.test(symbol)) return "leap";
 
   // Leapers
-  if (/^[NDAECZGS]$/.test(symbol)) return "leap";
+  if (/^[NDAECZGHS]$/.test(symbol)) return "leap";
   if (/^[KMJ]$/.test(symbol)) return "leap";
 
   // Hoppers
@@ -33,12 +33,28 @@ export function applyGeometry(
   atom: MoveAtom,
   geometry: Geometry,
   ctx: GeometryContext,
+  side: Side = "white",
 ): MoveAtom {
+  const concrete = geometry.atomDeltas(atom.atom, atom.deltasAbstract, ctx);
+
+  let selected = concrete;
+  if (atom.directionalModifiers) {
+    if (!geometry.selectDirections) {
+      throw new Error(
+        `The '${geometry.meta.id}' geometry does not support direction modifiers ('${atom.directionalModifiers}').`,
+      );
+    }
+    selected = [
+      ...geometry.selectDirections(concrete, atom.directionalModifiers),
+    ];
+  }
+
   return {
     ...atom,
-    deltasConcrete: atom.deltasAbstract.flatMap(([dx, dy]) =>
-      geometry.interpretVector(dx, dy, ctx),
-    ),
+    deltasConcrete:
+      side === "white"
+        ? selected
+        : selected.map(({ df, dr }) => ({ df: -df, dr: -dr })),
   };
 }
 
@@ -144,6 +160,12 @@ export const DIRECTION_MAP: Record<string, Array<Direction>> = {
     [-4, 1],
     [-1, 4],
   ],
+  H: [
+    [0, 3],
+    [3, 0],
+    [0, -3],
+    [-3, 0],
+  ], // threeleaper
   S: [
     [1, 1],
     [1, 2],
@@ -192,18 +214,6 @@ export const DIRECTION_MAP: Record<string, Array<Direction>> = {
     [2, 1],
     [2, -1],
     [1, -2],
-    [-1, -2],
-    [-2, -1],
-    [-2, 1],
-    [-1, 2],
-  ],
-
-  // Nightrider (slide-knight)
-  H: [
-    [1, 2],
-    [2, 1],
-    [2, -1],
-    [1, -2], // knight deltas
     [-1, -2],
     [-2, -1],
     [-2, 1],

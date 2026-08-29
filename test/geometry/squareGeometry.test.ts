@@ -3,9 +3,9 @@ import { SquareRectGeometry } from "../../src/Geometry";
 import { squareCtx, expectCoord } from "./helpers";
 
 describe("SquareRectGeometry", () => {
-  describe("interpretVector", () => {
-    it("returns identity mapping", () => {
-      const deltas = SquareRectGeometry.interpretVector(2, -1, squareCtx);
+  describe("atomDeltas", () => {
+    it("keeps canonical square vectors unchanged", () => {
+      const deltas = SquareRectGeometry.atomDeltas("N", [[2, -1]], squareCtx);
       expect(deltas).to.deep.equal([{ df: 2, dr: -1 }]);
     });
   });
@@ -24,19 +24,4 @@ describe("SquareRectGeometry", () => {
     });
   });
 
-  describe("resolveDirectionKeyword", () => {
-    it("maps f/b/l/r correctly", () => {
-      expect(SquareRectGeometry.resolveDirectionKeyword("f", "white"))
-        .to.deep.equal({ dx: 0, dy: 1 });
-
-      expect(SquareRectGeometry.resolveDirectionKeyword("b", "white"))
-        .to.deep.equal({ dx: 0, dy: -1 });
-
-      expect(SquareRectGeometry.resolveDirectionKeyword("l", "white"))
-        .to.deep.equal({ dx: -1, dy: 0 });
-
-      expect(SquareRectGeometry.resolveDirectionKeyword("r", "white"))
-        .to.deep.equal({ dx: 1, dy: 0 });
-    });
-  });
 });

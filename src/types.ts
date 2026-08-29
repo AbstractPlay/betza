@@ -1,4 +1,5 @@
 export type Direction = [number, number];
+export type Side = "white" | "black";
 
 export interface Modifiers {
   t?: boolean; // take and continue
@@ -15,6 +16,7 @@ export interface Modifiers {
 }
 
 export type MoveAtom = {
+  atom: string; // atom letter, before modifiers
   kind: "leap" | "slide" | "hop";
 
   deltasAbstract: Direction[];
@@ -27,10 +29,10 @@ export type MoveAtom = {
   moveOnly: boolean; // m
   captureOnly: boolean; // c
 
-  directionsRestricted: boolean;
-  allowedDirections?: Direction[];
+  directionalModifiers?: string; // f/b/l/r/v/s
 
   requiresClearPath: boolean; // p
+  nonJumping?: boolean; // n
   againRider: boolean; // a
 
   zigzag?: boolean; // z
