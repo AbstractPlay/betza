@@ -38,6 +38,22 @@ console.log(moves);
 - Create a piece (some geometry context is required)
 - Generate moves from a coordinate
 
+## Piece orientation (white vs black)
+
+The `Piece` constructor accepts an optional fifth argument, `side` (`"white"` | `"black"`, default `"white"`). Directional atoms and modifiers (`P`, `fW`, `ffN`, etc.) are oriented relative to this side.
+
+```ts
+import { Piece, RectBoard, SquareRectGeometry } from "@abstractplay/betza";
+
+const board = new RectBoard(["........", "........", "....F...", "........", "........", "........", "........", "........"]);
+const ctx = board.geometryContext;
+
+const whitePawn = new Piece("pawn", "P", ctx, SquareRectGeometry, "white");
+const blackPawn = new Piece("pawn", "P", ctx, SquareRectGeometry, "black");
+```
+
+If your Betza string already encodes direction in modifiers (e.g. `fmWfcF` for a pawn), you may not need to pass `side`. The `Side` type is exported from the package for typing.
+
 ## Board Representation
 
 The library uses a simple grid‑based board:
@@ -201,13 +217,13 @@ parseBetza("pgB"); // clear-path grasshopper bishop
 | x (must not capture first) | ✔️ | ✔️ | ✔️ | Same as above, inverted |
 | y (capture then leap) | ✔️ | ✔️ | ✔️ | Per-ray on slides |
 | p (requires clear path) | ✔️ | ✔️ | ✔️ | All intervening squares must be empty |
-| n (blockable leap) | ✔️ | — | — | Stopped by anything on the squares the leap passes over |
+| n (blockable leap) | ✔️ | — | — | Stopped by anything on the squares the leap passes over; invalid on slides/hops throws at parse time |
 | z (zig‑zag) | — | ✔️ | — | Alternates direction each step; square boards only |
 | g (grasshopper movement) | — | — | ✔️ | Converts atom into hopper |
 | h (locust movement) | — | — | ✔️ | Enemy hurdle, empty landing beyond |
 | j (cannon) | ✔️ | ✔️ | ✔️ | Requires exact hurdle count on path |
 | a (series rider) | ✔️ | ✔️ | — | Riderizes leaper atoms |
-| f/b/l/r/v/s (directional) | ✔️ | ✔️ | ✔️ | Half-plane, quadrant, or narrowed axis |
+| f/b/l/r/v/s (directional) | ✔️ | ✔️ | ✔️ | Half-plane / quadrant on square and hex; oblique narrowing (`ffN`, `fsN`) square boards only |
 | m (move‑only) | ✔️ | ✔️ | ✔️ | Universal |
 | c (capture‑only) | ✔️ | ✔️ | ✔️ | Universal |
 

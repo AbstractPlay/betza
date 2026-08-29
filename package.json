@@ -7,7 +7,7 @@
   "scripts": {
     "build": "npm run build-ts && npm run lint",
     "build-ts": "tsc && npm pack",
-    "test": "mocha -r ts-node/register test/**/*.test.ts",
+    "test": "mocha",
     "lint": "npx eslint .",
     "dist": "rimraf dist && webpack --mode=production",
     "full": "npm run test && npm run build && npm run dist",

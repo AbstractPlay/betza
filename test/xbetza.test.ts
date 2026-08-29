@@ -163,6 +163,22 @@ describe("expandAtom – modifiers", () => {
     expect(a.requiresClearPath).to.equal(true);
   });
 
+  it("rejects blockable leap (n) on slides", () => {
+    expect(() => expandAtom("R", mods({ nonJumping: true }))).to.throw(
+      /blockable leap.*slide/,
+    );
+    expect(() => parseBetza("nR")).to.throw(/blockable leap.*slide/);
+    expect(() => parseBetza("anN")).to.throw(/blockable leap.*slide/);
+    expect(() => parseBetza("nN")).to.not.throw();
+  });
+
+  it("rejects blockable leap (n) on hoppers", () => {
+    expect(() => expandAtom("W", mods({ nonJumping: true, hopStyle: "grasshopper", hopCount: 1 }))).to.throw(
+      /blockable leap.*hop/,
+    );
+    expect(() => parseBetza("ngW")).to.throw(/blockable leap.*hop/);
+  });
+
   it("grasshopper (g)", () => {
     const a = expandAtom("W", mods({ hopStyle: "grasshopper", hopCount: 1 }));
     expect(a.kind).to.equal("hop");

@@ -1,4 +1,5 @@
 import { Geometry } from ".";
+import { selectByHalfPlanes } from "./directionModifiers";
 
 type Delta = { df: number; dr: number };
 
@@ -83,4 +84,6 @@ export const HexAxialGeometry: Geometry = {
     }
     return { file: q, rank: r };
   },
+
+  selectDirections: selectByHalfPlanes,
 };

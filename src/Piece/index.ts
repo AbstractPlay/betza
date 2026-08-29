@@ -12,8 +12,23 @@ export class Piece {
   public readonly id: string;
   public readonly betza: string;
   public readonly geometry: Geometry;
-  public atoms: MoveAtom[];
+  public readonly atoms: readonly MoveAtom[];
 
+  /**
+   * Parse a Betza string into a geometry-aware piece definition.
+   *
+   * @param side - Which side the piece belongs to (`"white"` or `"black"`).
+   *   Defaults to `"white"`. Directional atoms (`P`, `fW`, `ffN`, etc.) and
+   *   their move targets depend on this value. Pass `"black"` for black pieces.
+   *
+   * @example
+   * ```ts
+   * const blackPawn = new Piece("pawn", "P", ctx, SquareRectGeometry, "black");
+   * ```
+   *
+   * Betza strings that encode direction explicitly in modifiers (e.g. `fmWfcF`)
+   * may not need a non-default `side`.
+   */
   constructor(
     id: string,
     betza: string,

@@ -79,5 +79,11 @@ export function expandAtom(
     base.mustNotCaptureFirst = false;
   }
 
+  if (mods.nonJumping && base.kind !== "leap") {
+    throw new Error(
+      `The 'n' (blockable leap) modifier applies only to leapers; atom '${atom}' is a ${base.kind}.`,
+    );
+  }
+
   return base;
 }

@@ -2,6 +2,7 @@ import "mocha";
 import { expect } from "chai";
 import { Piece } from "../src/Piece";
 import { RectBoard } from "../src/Board";
+import { SquareRectGeometry } from "../src/Geometry";
 import { generateMoves } from "../src/generateMoves";
 import { parseBetza } from "../src/Piece/parseBetza";
 
@@ -66,5 +67,27 @@ describe("README examples", () => {
     expect(() => parseBetza("tuR")).to.not.throw();
     expect(() => parseBetza("yN")).to.not.throw();
     expect(() => parseBetza("pgB")).to.not.throw();
+  });
+
+  it("black pawn moves toward lower rank", () => {
+    const board = new RectBoard([
+      "........",
+      "........",
+      "........",
+      "....F...",
+      "........",
+      "........",
+      "........",
+      "........",
+    ]);
+    const blackPawn = new Piece(
+      "pawn",
+      "P",
+      board.geometryContext,
+      SquareRectGeometry,
+      "black",
+    );
+    const moves = generateMoves(blackPawn, 4, 3, board);
+    expect(moves).to.deep.equal([[4, 2]]);
   });
 });
