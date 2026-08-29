@@ -35,9 +35,9 @@ export interface Geometry {
     ctx: GeometryContext,
   ): BoardCoordinate | null;
 
-  // Optional: specialize direction keywords if you want (f/b/l/r etc.)
-  resolveDirectionKeyword(
-    keyword: "f" | "b" | "l" | "r" | "v" | "s" | "h",
-    sideToMove: "white" | "black",
-  ): { dx: number; dy: number };
+  // Optional: narrows deltas down to the direction modifiers (f/b/l/r/v/s)
+  selectDirections?(
+    deltas: ReadonlyArray<{ df: number; dr: number }>,
+    modifiers: string,
+  ): ReadonlyArray<{ df: number; dr: number }>;
 }

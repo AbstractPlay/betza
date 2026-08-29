@@ -4,6 +4,7 @@ import { Piece } from "../../src/Piece";
 import { parseBetza } from "../../src/Piece/parseBetza";
 import { generateMoves, handleCaptureThenLeap } from "../../src/generateMoves";
 import { boardFromGrid, squareCtx } from "../helpers";
+import { SquareRectGeometry } from "../../src/Geometry";
 
 describe("moveGen – modifiers", () => {
   it("moveOnly (m) excludes captures", () => {
@@ -68,6 +69,128 @@ describe("moveGen – modifiers", () => {
     const piece = new Piece("fW", "fW", squareCtx);
     const moves = generateMoves(piece, 1, 1, board);
     expect(moves).to.deep.equal([[1, 2]]);
+  });
+
+  it("forward knight and narrow forward knight", () => {
+    const board = boardFromGrid([
+      ".......",
+      ".......",
+      ".......",
+      "...F...",
+      ".......",
+      ".......",
+      ".......",
+    ]);
+    const forward = new Piece("fN", "fN", squareCtx);
+    const narrow = new Piece("ffN", "ffN", squareCtx);
+    expect(generateMoves(forward, 3, 3, board)).to.have.deep.members([
+      [1, 4], [2, 5], [4, 5], [5, 4],
+    ]);
+    expect(generateMoves(narrow, 3, 3, board)).to.have.deep.members([
+      [2, 5], [4, 5],
+    ]);
+  });
+
+  it("selects the wide oblique leaps with s", () => {
+    const board = boardFromGrid([
+      ".......",
+      ".......",
+      ".......",
+      "...F...",
+      ".......",
+      ".......",
+      ".......",
+    ]);
+    const wide = new Piece("fsN", "fsN", squareCtx);
+    expect(generateMoves(wide, 3, 3, board)).to.have.deep.members([[1, 4], [5, 4]]);
+  });
+
+  it("intersects perpendicular direction modifiers", () => {
+    const board = boardFromGrid([
+      ".......",
+      ".......",
+      ".......",
+      "...F...",
+      ".......",
+      ".......",
+      ".......",
+    ]);
+    const quadrant = new Piece("flN", "flN", squareCtx);
+    const single = new Piece("fflN", "fflN", squareCtx);
+    expect(generateMoves(quadrant, 3, 3, board)).to.have.deep.members([
+      [2, 5], [1, 4],
+    ]);
+    expect(generateMoves(single, 3, 3, board)).to.deep.equal([[2, 5]]);
+  });
+
+  it("reads a perpendicular pair per component of a compound atom", () => {
+    const board = boardFromGrid([
+      ".......",
+      ".......",
+      ".......",
+      "...F...",
+      ".......",
+      ".......",
+      ".......",
+    ]);
+    expect(generateMoves(new Piece("frK", "frK", squareCtx), 3, 3, board))
+      .to.have.deep.members([[3, 4], [4, 3], [4, 4]]);
+    expect(generateMoves(new Piece("frB", "frB", squareCtx), 3, 3, board))
+      .to.have.deep.members([[4, 4], [5, 5], [6, 6]]);
+    expect(generateMoves(new Piece("frW", "frW", squareCtx), 3, 3, board))
+      .to.have.deep.members([[3, 4], [4, 3]]);
+  });
+
+  it("reads s as sideways and v as vertical", () => {
+    const board = boardFromGrid([
+      ".....",
+      ".....",
+      "..F..",
+      ".....",
+      ".....",
+    ]);
+    const sideways = new Piece("sR", "sR", squareCtx);
+    const vertical = new Piece("vR", "vR", squareCtx);
+    expect(generateMoves(new Piece("lrR", "lrR", squareCtx), 2, 2, board))
+      .to.have.deep.members(generateMoves(sideways, 2, 2, board));
+    expect(generateMoves(sideways, 2, 2, board)).to.have.deep.members([
+      [3, 2], [4, 2], [1, 2], [0, 2],
+    ]);
+    expect(generateMoves(vertical, 2, 2, board)).to.have.deep.members([
+      [2, 3], [2, 4], [2, 1], [2, 0],
+    ]);
+  });
+
+  it("restricts steppers and sliders to a half-plane", () => {
+    const board = boardFromGrid([
+      ".....",
+      ".....",
+      "..F..",
+      ".....",
+      ".....",
+    ]);
+    expect(generateMoves(new Piece("p", "fW", squareCtx), 2, 2, board))
+      .to.deep.equal([[2, 3]]);
+    expect(generateMoves(new Piece("l", "fR", squareCtx), 2, 2, board))
+      .to.have.deep.members([[2, 3], [2, 4]]);
+    expect(generateMoves(new Piece("g", "fF", squareCtx), 2, 2, board))
+      .to.have.deep.members([[3, 3], [1, 3]]);
+  });
+
+  it("orients directional pieces for black", () => {
+    const board = boardFromGrid([
+      ".......",
+      ".......",
+      ".......",
+      "...F...",
+      ".......",
+      ".......",
+      ".......",
+    ]);
+    const pawn = new Piece("pawn", "P", squareCtx, SquareRectGeometry, "black");
+    const knight = new Piece("knight", "ffN", squareCtx, SquareRectGeometry, "black");
+    expect(generateMoves(pawn, 3, 3, board)).to.deep.equal([[3, 2]]);
+    expect(generateMoves(knight, 3, 3, board)).to.have.deep.members([[2, 1], [4, 1]]);
   });
 
   it("series rider (aN) slides like nightrider", () => {
@@ -195,3 +318,4 @@ describe("handleCaptureThenLeap", () => {
     expect(result.map((s) => [s.x, s.y])).to.deep.include([5, 7]);
   });
 });
+

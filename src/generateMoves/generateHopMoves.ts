@@ -1,9 +1,6 @@
 import type { MoveAtom, BoardState, PathSquare } from "../types";
 import { handleCaptureThenLeap } from ".";
-import {
-  countPiecesOnLine,
-  filterDeltasByDirections,
-} from "./utils";
+import { countPiecesOnLine } from "./utils";
 
 export function generateHopMoves(
   atom: MoveAtom,
@@ -14,10 +11,7 @@ export function generateHopMoves(
 ) {
   if (!atom.deltasConcrete) return;
 
-  const deltas = filterDeltasByDirections(
-    atom.deltasConcrete,
-    atom.directionsRestricted ? atom.allowedDirections : undefined,
-  );
+  const deltas = atom.deltasConcrete;
 
   for (const { df, dr } of deltas) {
     const ray = buildHopRayDirection(atom, x, y, df, dr, board);

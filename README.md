@@ -178,7 +178,7 @@ Series riders use the `a` prefix (e.g. `aN` nightrider, or again-rider).
 | h        | locust movement        |
 | j        | cannon (hurdle count)  |
 | a        | series rider           |
-| f/b/l/r  | directional restrict   |
+| f/b/l/r/v/s | directional restrict |
 | m        | move only              |
 | c        | capture only           |
 
@@ -205,7 +205,7 @@ parseBetza("pgB"); // clear-path grasshopper bishop
 | h (locust movement) | — | — | ✔️ | Enemy hurdle, empty landing beyond |
 | j (cannon) | ✔️ | ✔️ | ✔️ | Requires exact hurdle count on path |
 | a (series rider) | ✔️ | ✔️ | — | Riderizes leaper atoms |
-| f/b/l/r (directional) | ✔️ | ✔️ | ✔️ | Restricts to forward/back/left/right |
+| f/b/l/r/v/s (directional) | ✔️ | ✔️ | ✔️ | Half-plane, quadrant, or narrowed axis |
 | m (move‑only) | ✔️ | ✔️ | ✔️ | Universal |
 | c (capture‑only) | ✔️ | ✔️ | ✔️ | Universal |
 

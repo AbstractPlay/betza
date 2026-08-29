@@ -15,8 +15,6 @@ function mods(extra = {}) {
     moveOnly: false,
     captureOnly: false,
     hopCount: 0,
-    directionsRestricted: false,
-    allowedDirections: undefined,
 
     requiresClearPath: false,
     againRider: false,

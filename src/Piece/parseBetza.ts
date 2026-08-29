@@ -1,47 +1,7 @@
-import type { MoveAtom, Direction } from "../types";
+import type { MoveAtom } from "../types";
 import { expandAtom } from "./expandAtom";
 
-const DIRECTION_SETS: Record<string, Direction[]> = {
-  f: [
-    [0, 1],
-    [1, 1],
-    [-1, 1],
-  ],
-  b: [
-    [0, -1],
-    [1, -1],
-    [-1, -1],
-  ],
-  l: [
-    [-1, 0],
-    [-1, 1],
-    [-1, -1],
-  ],
-  r: [
-    [1, 0],
-    [1, 1],
-    [1, -1],
-  ],
-};
-
-function mergeDirections(
-  existing: Direction[] | undefined,
-  next: Direction[],
-): Direction[] {
-  const seen = new Set<string>();
-  const merged: Direction[] = [];
-
-  for (const dirs of [existing ?? [], next]) {
-    for (const d of dirs) {
-      const key = `${d[0]},${d[1]}`;
-      if (seen.has(key)) continue;
-      seen.add(key);
-      merged.push(d);
-    }
-  }
-
-  return merged;
-}
+const DIRECTION_MODIFIERS = "fblrvs";
 
 export function parseBetza(x: string): MoveAtom[] {
   if (x.length === 0) {
@@ -56,8 +16,7 @@ export function parseBetza(x: string): MoveAtom[] {
     let captureOnly = false;
     let hopCount = 0;
 
-    let directionsRestricted = false;
-    let allowedDirections: Direction[] | undefined = undefined;
+    let directionalModifiers = "";
 
     let requiresClearPath = false;
     let againRider = false;
@@ -145,12 +104,8 @@ export function parseBetza(x: string): MoveAtom[] {
         continue;
       }
 
-      if (c in DIRECTION_SETS) {
-        directionsRestricted = true;
-        allowedDirections = mergeDirections(
-          allowedDirections,
-          DIRECTION_SETS[c],
-        );
+      if (DIRECTION_MODIFIERS.includes(c)) {
+        directionalModifiers += c;
         i++;
         continue;
       }
@@ -165,12 +120,20 @@ export function parseBetza(x: string): MoveAtom[] {
     const atomChar = x[i];
     i++;
 
+    let range: number | undefined;
+    const digits = /^\d+/.exec(x.slice(i));
+    if (digits !== null) {
+      range = parseInt(digits[0], 10);
+      if (range < 1) throw new Error(`A range of ${range} is not usable: ${x}`);
+      i += digits[0].length;
+    }
+
     const atom = expandAtom(atomChar, {
       moveOnly,
       captureOnly,
       hopCount,
-      directionsRestricted,
-      allowedDirections,
+      directionalModifiers: directionalModifiers || undefined,
+      range,
       requiresClearPath,
       againRider,
       hopStyle,

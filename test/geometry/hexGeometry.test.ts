@@ -27,19 +27,4 @@ describe("HexAxialGeometry", () => {
     });
   });
 
-  describe("resolveDirectionKeyword", () => {
-    it("maps f/b/l/r correctly for axial", () => {
-      expect(HexAxialGeometry.resolveDirectionKeyword("f", "white"))
-        .to.deep.equal({ dx: 0, dy: 1 });
-
-      expect(HexAxialGeometry.resolveDirectionKeyword("b", "white"))
-        .to.deep.equal({ dx: 0, dy: -1 });
-
-      expect(HexAxialGeometry.resolveDirectionKeyword("l", "white"))
-        .to.deep.equal({ dx: -1, dy: 0 });
-
-      expect(HexAxialGeometry.resolveDirectionKeyword("r", "white"))
-        .to.deep.equal({ dx: 1, dy: 0 });
-    });
-  });
 });

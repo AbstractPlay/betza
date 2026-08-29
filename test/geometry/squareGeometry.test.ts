@@ -24,19 +24,4 @@ describe("SquareRectGeometry", () => {
     });
   });
 
-  describe("resolveDirectionKeyword", () => {
-    it("maps f/b/l/r correctly", () => {
-      expect(SquareRectGeometry.resolveDirectionKeyword("f", "white"))
-        .to.deep.equal({ dx: 0, dy: 1 });
-
-      expect(SquareRectGeometry.resolveDirectionKeyword("b", "white"))
-        .to.deep.equal({ dx: 0, dy: -1 });
-
-      expect(SquareRectGeometry.resolveDirectionKeyword("l", "white"))
-        .to.deep.equal({ dx: -1, dy: 0 });
-
-      expect(SquareRectGeometry.resolveDirectionKeyword("r", "white"))
-        .to.deep.equal({ dx: 1, dy: 0 });
-    });
-  });
 });

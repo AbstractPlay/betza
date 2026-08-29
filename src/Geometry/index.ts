@@ -7,7 +7,7 @@ export {
 export { SquareRectGeometry } from "./SquareRectGeometry";
 export { HexAxialGeometry } from "./HexAxialGeometry";
 
-import type { Direction, MoveAtom } from "../types";
+import type { Direction, MoveAtom, Side } from "../types";
 import { GeometryContext, Geometry } from "./Geometry";
 
 export function classifyGeometry(symbol: string): "slide" | "leap" | "hop" {
@@ -33,10 +33,28 @@ export function applyGeometry(
   atom: MoveAtom,
   geometry: Geometry,
   ctx: GeometryContext,
+  side: Side = "white",
 ): MoveAtom {
+  const concrete = geometry.atomDeltas(atom.atom, atom.deltasAbstract, ctx);
+
+  let selected = concrete;
+  if (atom.directionalModifiers) {
+    if (!geometry.selectDirections) {
+      throw new Error(
+        `The '${geometry.meta.id}' geometry does not support direction modifiers ('${atom.directionalModifiers}').`,
+      );
+    }
+    selected = [
+      ...geometry.selectDirections(concrete, atom.directionalModifiers),
+    ];
+  }
+
   return {
     ...atom,
-    deltasConcrete: geometry.atomDeltas(atom.atom, atom.deltasAbstract, ctx),
+    deltasConcrete:
+      side === "white"
+        ? selected
+        : selected.map(({ df, dr }) => ({ df: -df, dr: -dr })),
   };
 }
 

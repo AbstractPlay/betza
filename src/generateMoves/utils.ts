@@ -1,20 +1,3 @@
-import type { Direction } from "../types";
-
-export function filterDeltasByDirections(
-  deltas: ReadonlyArray<{ df: number; dr: number }>,
-  allowedDirections?: Direction[],
-): Array<{ df: number; dr: number }> {
-  if (!allowedDirections || allowedDirections.length === 0) {
-    return [...deltas];
-  }
-
-  return deltas.filter(({ df, dr }) =>
-    allowedDirections.some(
-      ([adx, ady]) => adx * dr === ady * df && adx * df + ady * dr > 0,
-    ),
-  );
-}
-
 export function countPiecesOnLine(
   x: number,
   y: number,

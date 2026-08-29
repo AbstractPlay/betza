@@ -1,10 +1,7 @@
 import type { MoveAtom, BoardState, PathSquare } from "../types";
 import { handleCaptureThenLeap } from ".";
 import { generateSlideMoves } from "./generateSlideMoves";
-import {
-  countPiecesOnLine,
-  filterDeltasByDirections,
-} from "./utils";
+import { countPiecesOnLine } from "./utils";
 
 export function generateLeapMoves(
   atom: MoveAtom,
@@ -15,10 +12,7 @@ export function generateLeapMoves(
 ) {
   if (!atom.deltasConcrete) return;
 
-  const deltas = filterDeltasByDirections(
-    atom.deltasConcrete,
-    atom.directionsRestricted ? atom.allowedDirections : undefined,
-  );
+  const deltas = atom.deltasConcrete;
 
   const targets = deltas.map(({ df, dr }) => [x + df, y + dr] as [number, number]);
   let annotated = annotateLeapTargets(targets, board);

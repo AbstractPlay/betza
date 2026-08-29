@@ -1,4 +1,5 @@
 export type Direction = [number, number];
+export type Side = "white" | "black";
 
 export interface Modifiers {
   t?: boolean; // take and continue
@@ -28,8 +29,7 @@ export type MoveAtom = {
   moveOnly: boolean; // m
   captureOnly: boolean; // c
 
-  directionsRestricted: boolean;
-  allowedDirections?: Direction[];
+  directionalModifiers?: string; // f/b/l/r/v/s
 
   requiresClearPath: boolean; // p
   againRider: boolean; // a

@@ -9,8 +9,6 @@ const modsNone = {
   moveOnly: false,
   captureOnly: false,
   hopCount: 0,
-  directionsRestricted: false,
-  allowedDirections: undefined,
   requiresClearPath: false,
   againRider: false,
   hopStyle: undefined,
