@@ -319,3 +319,42 @@ describe("handleCaptureThenLeap", () => {
   });
 });
 
+describe("moveGen – crooked sliders (z)", () => {
+  it("alternates between two directions rather than turning the same way", () => {
+    const board = boardFromGrid([
+      ".....",
+      ".....",
+      ".....",
+      ".....",
+      ".....",
+    ]);
+    const moves = generateMoves(new Piece("zB", "zB", squareCtx), 2, 2, board)
+      .map(([x, y]) => `${x},${y}`);
+    expect(moves.sort()).to.deep.equal(
+      ["1,1", "0,2", "2,0", "3,1", "1,3", "4,2", "2,4", "3,3"].sort());
+    expect(moves).to.not.include("4,4");
+    expect(moves).to.not.include("0,0");
+    expect(moves).to.not.include("2,2");
+  });
+
+  it("is blocked like any other rider", () => {
+    const board = boardFromGrid([
+      ".....",
+      "...E.",
+      ".....",
+      ".F...",
+      ".....",
+    ]);
+    const moves = generateMoves(new Piece("zB", "zB", squareCtx), 2, 2, board)
+      .map(([x, y]) => `${x},${y}`);
+    expect(moves).to.not.include("1,3");
+    expect(moves).to.include("3,1");
+    expect(moves).to.include("3,3");
+    const quiet = generateMoves(new Piece("mzB", "mzB", squareCtx), 2, 2, board)
+      .map(([x, y]) => `${x},${y}`);
+    expect(quiet).to.not.include("3,1");
+    const takes = generateMoves(new Piece("czB", "czB", squareCtx), 2, 2, board)
+      .map(([x, y]) => `${x},${y}`);
+    expect(takes).to.deep.equal(["3,1"]);
+  });
+});

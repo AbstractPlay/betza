@@ -202,7 +202,7 @@ parseBetza("pgB"); // clear-path grasshopper bishop
 | y (capture then leap) | ✔️ | ✔️ | ✔️ | Per-ray on slides |
 | p (requires clear path) | ✔️ | ✔️ | ✔️ | All intervening squares must be empty |
 | n (blockable leap) | ✔️ | — | — | Stopped by anything on the squares the leap passes over |
-| z (zig‑zag) | — | ✔️ | — | Alternates direction each step |
+| z (zig‑zag) | — | ✔️ | — | Alternates direction each step; square boards only |
 | g (grasshopper movement) | — | — | ✔️ | Converts atom into hopper |
 | h (locust movement) | — | — | ✔️ | Enemy hurdle, empty landing beyond |
 | j (cannon) | ✔️ | ✔️ | ✔️ | Requires exact hurdle count on path |

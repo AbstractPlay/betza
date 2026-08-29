@@ -14,21 +14,27 @@ export function generateSlideMoves(
   const deltas = atom.deltasConcrete;
 
   for (const { df, dr } of deltas) {
-    const path = atom.zigzag
-      ? buildZigzagRayDirection(atom, x, y, df, dr, board)
-      : buildRayDirection(atom, x, y, df, dr, board);
-    let annotated = annotateRay(path, board);
+    const paths = atom.zigzag
+      ? [
+          buildZigzagRayDirection(atom, x, y, df, dr, 1, board),
+          buildZigzagRayDirection(atom, x, y, df, dr, -1, board),
+        ]
+      : [buildRayDirection(atom, x, y, df, dr, board)];
 
-    annotated = applyRequiresClearPath(annotated, atom);
-    annotated = applyCannonRules(annotated, atom, x, y, board);
-    annotated = applyCaptureRules(annotated, atom, board);
+    for (const path of paths) {
+      let annotated = annotateRay(path, board);
 
-    if (atom.takeAndContinue) {
-      annotated = handleTakeAndContinue(annotated);
+      annotated = applyRequiresClearPath(annotated, atom);
+      annotated = applyCannonRules(annotated, atom, x, y, board);
+      annotated = applyCaptureRules(annotated, atom, board);
+
+      if (atom.takeAndContinue) {
+        annotated = handleTakeAndContinue(annotated);
+      }
+
+      const moves = emitMoves(annotated, atom);
+      out.push(...moves);
     }
-
-    const moves = emitMoves(annotated, atom);
-    out.push(...moves);
   }
 }
 
@@ -62,12 +68,13 @@ function buildZigzagRayDirection(
   y: number,
   startDf: number,
   startDr: number,
+  turn: 1 | -1,
   board: BoardState,
 ): Array<[number, number]> {
   const ray: Array<[number, number]> = [];
   const visited = new Set<string>();
-  let df = startDf;
-  let dr = startDr;
+  const turnedDf = turn === 1 ? -startDr : startDr;
+  const turnedDr = turn === 1 ? startDf : -startDf;
   let cx = x;
   let cy = y;
   let step = 1;
@@ -76,8 +83,9 @@ function buildZigzagRayDirection(
     : board.width + board.height;
 
   while (step <= maxSteps) {
-    cx += df;
-    cy += dr;
+    const straight = step % 2 === 1;
+    cx += straight ? startDf : turnedDf;
+    cy += straight ? startDr : turnedDr;
 
     const key = `${cx},${cy}`;
     const sq = board.get(cx, cy);
@@ -85,7 +93,6 @@ function buildZigzagRayDirection(
 
     visited.add(key);
     ray.push([cx, cy]);
-    [df, dr] = [-dr, df];
     step++;
   }
 
