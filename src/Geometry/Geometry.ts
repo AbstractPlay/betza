@@ -20,10 +20,10 @@ export interface GeometryContext {
 export interface Geometry {
   readonly meta: GeometryId;
 
-  // Map “Betza vector” to one or more concrete deltas in this geometry
-  interpretVector(
-    dx: number,
-    dy: number,
+  // Resolve one Betza atom into this board's native directions
+  atomDeltas(
+    atom: string,
+    canonical: ReadonlyArray<readonly [number, number]>,
     ctx: GeometryContext,
   ): ReadonlyArray<{ df: number; dr: number }>;
 

@@ -36,9 +36,7 @@ export function applyGeometry(
 ): MoveAtom {
   return {
     ...atom,
-    deltasConcrete: atom.deltasAbstract.flatMap(([dx, dy]) =>
-      geometry.interpretVector(dx, dy, ctx),
-    ),
+    deltasConcrete: geometry.atomDeltas(atom.atom, atom.deltasAbstract, ctx),
   };
 }
 

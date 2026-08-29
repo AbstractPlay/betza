@@ -27,6 +27,7 @@ export function expandAtom(
   }
 
   const base: MoveAtom = {
+    atom,
     kind: classifyGeometry(atom),
     deltasAbstract: DIRECTION_MAP[atom] ?? [],
     maxSteps: classifyGeometry(atom) === "slide" ? Infinity : 1,

@@ -3,10 +3,13 @@ import { HexAxialGeometry } from "../../src/Geometry";
 import { hexCtx, expectCoord } from "./helpers";
 
 describe("HexAxialGeometry", () => {
-  describe("interpretVector", () => {
-    it("maps dx,dy to axial q,r", () => {
-      const deltas = HexAxialGeometry.interpretVector(1, -1, hexCtx);
-      expect(deltas).to.deep.equal([{ df: 1, dr: -1 }]);
+  describe("atomDeltas", () => {
+    it("gives a wazir all six adjacent hexes", () => {
+      const deltas = HexAxialGeometry.atomDeltas("W", [], hexCtx);
+      expect(deltas).to.have.deep.members([
+        {df: 1, dr: 0}, {df: 0, dr: 1}, {df: -1, dr: 1},
+        {df: -1, dr: 0}, {df: 0, dr: -1}, {df: 1, dr: -1},
+      ]);
     });
   });
 

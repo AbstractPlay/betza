@@ -4,9 +4,8 @@ export const SquareRectGeometry: Geometry = {
   meta: { id: "square-rect", version: "1.0.0" },
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  interpretVector(dx, dy, ctx) {
-    // For orthodox square boards, (dx, dy) is already in board space
-    return [{ df: dx, dr: dy }];
+  atomDeltas(atom, canonical, ctx) {
+    return canonical.map(([df, dr]) => ({ df, dr }));
   },
 
   applyDelta(from, df, dr, ctx) {

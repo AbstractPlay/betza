@@ -15,6 +15,7 @@ export interface Modifiers {
 }
 
 export type MoveAtom = {
+  atom: string; // atom letter, before modifiers
   kind: "leap" | "slide" | "hop";
 
   deltasAbstract: Direction[];
