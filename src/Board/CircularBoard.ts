@@ -1,6 +1,6 @@
-import type { SquareState, SquareKind } from "../types";
-import { BaseBoard } from "./_base";
-import type { GeometryContext } from "../Geometry";
+import type { SquareState, SquareKind } from "../types.js";
+import { BaseBoard } from "./_base.js";
+import type { GeometryContext } from "../Geometry/index.js";
 
 export interface CircularBoardOptions {
   wrapX?: boolean;

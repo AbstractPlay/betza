@@ -1,7 +1,7 @@
-import type { MoveAtom, BoardState, PathSquare } from "../types";
-import { handleCaptureThenLeap } from ".";
-import { generateSlideMoves } from "./generateSlideMoves";
-import { countPiecesOnLeapPath, countPiecesOnLine } from "./utils";
+import type { MoveAtom, BoardState, PathSquare } from "../types.js";
+import { handleCaptureThenLeap } from "./index.js";
+import { generateSlideMoves } from "./generateSlideMoves.js";
+import { countPiecesOnLeapPath, countPiecesOnLine } from "./utils.js";
 
 export function generateLeapMoves(
   atom: MoveAtom,

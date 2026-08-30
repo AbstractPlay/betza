@@ -1,0 +1,25 @@
+# Validate pull requests against main — test and build only (no publish).
+
+name: Pull request validation
+
+on:
+  pull_request:
+    branches: [ "main" ]
+  workflow_dispatch:
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v4
+    - name: Use Node.js 24
+      uses: actions/setup-node@v4
+      with:
+        node-version: 24
+        cache: 'npm'
+    - name: Pin npm
+      run: npm install -g npm@11.6.2
+    - run: npm ci
+    - run: npm test
+    - run: npm run build

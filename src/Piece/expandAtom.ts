@@ -1,5 +1,5 @@
-import type { MoveAtom } from "../types";
-import { classifyGeometry, DIRECTION_MAP } from "../Geometry";
+import type { MoveAtom } from "../types.js";
+import { classifyGeometry, DIRECTION_MAP } from "../Geometry/index.js";
 
 export function expandAtom(
   atom: string,

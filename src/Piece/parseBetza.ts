@@ -1,5 +1,5 @@
-import type { MoveAtom } from "../types";
-import { expandAtom } from "./expandAtom";
+import type { MoveAtom } from "../types.js";
+import { expandAtom } from "./expandAtom.js";
 
 const DIRECTION_MODIFIERS = "fblrvs";
 

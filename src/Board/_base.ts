@@ -1,4 +1,4 @@
-import type { GeometryContext } from "../Geometry";
+import type { GeometryContext } from "../Geometry/index.js";
 
 export class BaseBoard {
   public get geometryContext(): GeometryContext {

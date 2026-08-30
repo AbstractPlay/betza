@@ -1,6 +1,6 @@
-import type { SquareState, SquareKind } from "../types";
-import type { GeometryContext } from "../Geometry";
-import { BaseBoard } from "./_base";
+import type { SquareState, SquareKind } from "../types.js";
+import type { GeometryContext } from "../Geometry/index.js";
+import { BaseBoard } from "./_base.js";
 
 export interface HexBoardOptions {
   wrapQ?: boolean;

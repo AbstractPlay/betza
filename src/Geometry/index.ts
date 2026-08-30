@@ -3,12 +3,12 @@ export {
   BoardCoordinate,
   GeometryContext,
   Geometry,
-} from "./Geometry";
-export { SquareRectGeometry } from "./SquareRectGeometry";
-export { HexAxialGeometry } from "./HexAxialGeometry";
+} from "./Geometry.js";
+export { SquareRectGeometry } from "./SquareRectGeometry.js";
+export { HexAxialGeometry } from "./HexAxialGeometry.js";
 
-import type { Direction, MoveAtom, Side } from "../types";
-import { GeometryContext, Geometry } from "./Geometry";
+import type { Direction, MoveAtom, Side } from "../types.js";
+import { GeometryContext, Geometry } from "./Geometry.js";
 
 export function classifyGeometry(symbol: string): "slide" | "leap" | "hop" {
   // Sliding pieces

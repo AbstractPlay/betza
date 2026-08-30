@@ -1,11 +1,11 @@
-import { Geometry } from ".";
+import { Geometry } from "./index.js";
 import {
   type Delta,
   type DirectionGroup,
   directionConstants,
   inHalfPlane,
   readDirectionGroups,
-} from "./directionModifiers";
+} from "./directionModifiers.js";
 
 const { VERTICAL } = directionConstants;
 

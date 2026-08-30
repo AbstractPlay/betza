@@ -1,12 +1,12 @@
-import type { MoveAtom } from "../types";
+import type { MoveAtom } from "../types.js";
 import {
   applyGeometry,
   type Geometry,
   type GeometryContext,
-} from "../Geometry";
-import type { Side } from "../types";
-import { parseBetza } from "./parseBetza";
-import { SquareRectGeometry } from "../Geometry";
+} from "../Geometry/index.js";
+import type { Side } from "../types.js";
+import { parseBetza } from "./parseBetza.js";
+import { SquareRectGeometry } from "../Geometry/index.js";
 
 export class Piece {
   public readonly id: string;

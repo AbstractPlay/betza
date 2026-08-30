@@ -1,3 +1,3 @@
-export { RectBoard } from "./RectBoard";
-export { CircularBoard } from "./CircularBoard";
-export { HexBoard } from "./HexBoard";
+export { RectBoard } from "./RectBoard.js";
+export { CircularBoard } from "./CircularBoard.js";
+export { HexBoard } from "./HexBoard.js";

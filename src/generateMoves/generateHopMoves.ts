@@ -1,6 +1,6 @@
-import type { MoveAtom, BoardState, PathSquare } from "../types";
-import { handleCaptureThenLeap } from ".";
-import { countPiecesOnLine } from "./utils";
+import type { MoveAtom, BoardState, PathSquare } from "../types.js";
+import { handleCaptureThenLeap } from "./index.js";
+import { countPiecesOnLine } from "./utils.js";
 
 export function generateHopMoves(
   atom: MoveAtom,

@@ -1,5 +1,5 @@
-export { SquareRectGeometry, HexAxialGeometry } from "./Geometry";
-export { RectBoard, HexBoard, CircularBoard } from "./Board";
-export { Piece } from "./Piece";
-export { generateMoves } from "./generateMoves";
-export type { BoardState, Side, SquareState } from "./types";
+export { SquareRectGeometry, HexAxialGeometry } from "./Geometry/index.js";
+export { RectBoard, HexBoard, CircularBoard } from "./Board/index.js";
+export { Piece } from "./Piece/index.js";
+export { generateMoves } from "./generateMoves/index.js";
+export type { BoardState, Side, SquareState } from "./types.js";

@@ -1,5 +1,5 @@
-import { Geometry } from ".";
-import { selectByHalfPlanes } from "./directionModifiers";
+import { Geometry } from "./index.js";
+import { selectByHalfPlanes } from "./directionModifiers.js";
 
 type Delta = { df: number; dr: number };
 

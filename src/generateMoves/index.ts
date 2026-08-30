@@ -1,9 +1,9 @@
-import { generateHopMoves } from "./generateHopMoves";
-import { generateLeapMoves } from "./generateLeapMoves";
-import { generateSlideMoves } from "./generateSlideMoves";
-import { dedupeMoves } from "./utils";
+import { generateHopMoves } from "./generateHopMoves.js";
+import { generateLeapMoves } from "./generateLeapMoves.js";
+import { generateSlideMoves } from "./generateSlideMoves.js";
+import { dedupeMoves } from "./utils.js";
 
-import type { MoveAtom, BoardState, PathSquare } from "../types";
+import type { MoveAtom, BoardState, PathSquare } from "../types.js";
 
 export function generateMoves(
   piece: { atoms: MoveAtom[] },
