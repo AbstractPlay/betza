@@ -16,7 +16,7 @@
     "build-ts": "tsc && npm pack",
     "typecheck": "tsc --noEmit",
     "pretest": "npm run typecheck",
-    "test:postbuild": "node scripts/smoke-esm-entry.mjs",
+    "test:postbuild": "node scripts/smoke-package-entry.mjs",
     "test": "mocha",
     "lint": "npx eslint .",
     "format": "prettier --write \"src/**/*.ts\""
