@@ -6,7 +6,7 @@ import { dedupeMoves } from "./utils.js";
 import type { MoveAtom, BoardState, PathSquare } from "../types.js";
 
 export function generateMoves(
-  piece: { atoms: MoveAtom[] },
+  piece: { atoms: readonly MoveAtom[] },
   x: number,
   y: number,
   board: BoardState,
