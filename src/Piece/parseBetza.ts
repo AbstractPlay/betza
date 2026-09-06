@@ -55,6 +55,9 @@ export function parseBetza(source: string): MoveAtom[] {
     } else if (!/[A-Z@]/.test(atom)) {
       throw new Error(`Expected a Betza atom at position ${i - 1}, got '${atom}'`);
     }
+    if (atom === "O") {
+      throw new Error("The XBetza castling atom 'O' requires move history, not a board origin; this has to be handled by a game rule");
+    }
     if (atom === "@") {
       throw new Error("The XBetza drop atom '@' requires a hand, not a board origin; use a game drop rule");
     }

@@ -505,5 +505,7 @@ describe("Betza/XBetza notation", () => {
     for (const notation of ["xR", "uR", "yN"]) {
       expect(() => parseBetza(notation)).to.throw(/Expected a Betza atom/);
     }
+expect(() => parseBetza("O2")).to.throw(/castling atom/);
+    expect(() => parseBetza("@")).to.throw(/drop atom/);
   });
 });
