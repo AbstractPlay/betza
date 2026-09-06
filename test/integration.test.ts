@@ -33,12 +33,12 @@ describe("integration – Piece + board geometryContext", () => {
     expect(moves.length).to.be.greaterThan(0);
   });
 
-  it("HexBoard + take-and-continue rook", () => {
+  it("HexBoard + rook", () => {
     const rows = Array.from({ length: 10 }, () => "..........");
     const board = new HexBoard(rows);
     const piece = new Piece(
-      "hextrrook",
-      "tR",
+      "hexrook",
+      "R",
       board.geometryContext,
       HexAxialGeometry,
     );

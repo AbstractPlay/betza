@@ -204,8 +204,8 @@ parseBetza("fcafmF"); // checker capture: capture, then continue forward
 ## Stateful and game-level notation
 
 `i`, `e`, and `t` use the optional `BoardState.isVirgin`, `isEnPassantTarget`,
-and `isRoyal` hooks. Without the corresponding hook the state-dependent move is
-unavailable.
+and `isRoyal` hooks. Without `isVirgin` or `isEnPassantTarget`, the `i` and `e`
+moves are unavailable; without `isRoyal`, the `t` restriction has no effect.
 
 The drop atom `@` and the castling atom `O` need a hand and a move history, so
 `parseBetza` rejects both. Handle them in your game rules.
