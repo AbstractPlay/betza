@@ -1,6 +1,4 @@
 import type { MoveAtom, BoardState, PathSquare } from "../types.js";
-import { handleCaptureThenLeap } from "./index.js";
-import { generateSlideMoves } from "./generateSlideMoves.js";
 import { countPiecesOnLeapPath, countPiecesOnLine } from "./utils.js";
 
 export function generateLeapMoves(
@@ -11,6 +9,7 @@ export function generateLeapMoves(
   out: Array<[number, number]>,
 ) {
   if (!atom.deltasConcrete) return;
+  if (atom.initialOnly && board.isVirgin?.(x, y) !== true) return;
 
   const deltas = atom.deltasConcrete;
 
@@ -22,20 +21,6 @@ export function generateLeapMoves(
 
   for (const sq of annotated) {
     out.push([sq.x, sq.y]);
-
-    if (atom.takeAndContinue && sq.sq?.kind === "enemy") {
-      const slideAtom: MoveAtom = {
-        ...atom,
-        kind: "slide",
-        maxSteps: Infinity,
-        takeAndContinue: true,
-        captureThenLeap: false,
-        mustCaptureFirst: false,
-        mustNotCaptureFirst: false,
-        deltasConcrete: deltas,
-      };
-      generateSlideMoves(slideAtom, sq.x, sq.y, board, out);
-    }
   }
 }
 
@@ -73,9 +58,10 @@ function applyLeapClearPath(
       (sq) => countPiecesOnLeapPath(x, y, sq.x, sq.y, board) === 0,
     );
   }
-  if (!atom.requiresClearPath) return path;
-
-  return path.filter((sq) => countPiecesOnLine(x, y, sq.x, sq.y, board) === 0);
+  if ((atom.mustJump ?? 0) > 0) {
+    return path.filter(sq => countPiecesOnLeapPath(x, y, sq.x, sq.y, board) >= atom.mustJump!);
+  }
+  return path;
 }
 
 function applyLeapModifiers(
@@ -83,25 +69,20 @@ function applyLeapModifiers(
   atom: MoveAtom,
   board: BoardState,
 ): PathSquare[] {
-  if (atom.captureThenLeap) {
-    return handleCaptureThenLeap(path, atom, board);
-  }
-
   return path.filter((sq) => {
     if (!sq.sq) return false;
 
-    if (sq.sq.kind === "friendly" && !atom.unblockable) return false;
-    if (sq.sq.kind === "friendly" && atom.unblockable) return false;
+    if (sq.sq.kind === "friendly") return false;
 
     if (sq.sq.kind === "empty") {
-      if (atom.captureOnly) return false;
-      if (atom.mustCaptureFirst) return false;
+      if (atom.captureOnly && !atom.moveOnly) return false;
+      if (atom.enPassantOnly && board.isEnPassantTarget?.(sq.x, sq.y) !== true) return false;
       return true;
     }
 
     if (sq.sq.kind === "enemy") {
-      if (atom.moveOnly) return false;
-      if (atom.mustNotCaptureFirst) return false;
+      if (atom.moveOnly && !atom.captureOnly) return false;
+      if (atom.tame && board.isRoyal?.(sq.x, sq.y) === true) return false;
       return true;
     }
 

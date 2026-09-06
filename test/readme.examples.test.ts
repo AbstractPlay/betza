@@ -31,7 +31,7 @@ describe("README examples", () => {
     ]);
   });
 
-  it("take-and-continue rook on 8x8", () => {
+  it("standard rook on 8x8", () => {
     const board = new RectBoard([
       "........",
       "........",
@@ -42,7 +42,7 @@ describe("README examples", () => {
       "........",
       "........",
     ]);
-    const piece = new Piece("trrook", "tR", board.geometryContext);
+    const piece = new Piece("rook", "R", board.geometryContext);
     const moves = generateMoves(piece, 4, 4, board);
 
     expect(moves).to.have.deep.members([
@@ -64,9 +64,9 @@ describe("README examples", () => {
   });
 
   it("parseBetza examples from README compile", () => {
-    expect(() => parseBetza("tuR")).to.not.throw();
-    expect(() => parseBetza("yN")).to.not.throw();
-    expect(() => parseBetza("pgB")).to.not.throw();
+    expect(() => parseBetza("mRcpR")).to.not.throw();
+    expect(() => parseBetza("masR")).to.not.throw();
+    expect(() => parseBetza("(4,1)0")).to.not.throw();
   });
 
   it("black pawn moves toward lower rank", () => {
@@ -82,7 +82,7 @@ describe("README examples", () => {
     ]);
     const blackPawn = new Piece(
       "pawn",
-      "P",
+      "fW",
       board.geometryContext,
       SquareRectGeometry,
       "black",

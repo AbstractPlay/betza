@@ -55,9 +55,9 @@ describe("HexAxialGeometry – black side orientation", () => {
   const board = emptyHex();
   const center = 10;
 
-  it("P atom moves toward lower rank for black", () => {
-    const white = new Piece("pawn", "P", hexCtx, HexAxialGeometry, "white");
-    const black = new Piece("pawn", "P", hexCtx, HexAxialGeometry, "black");
+  it("a forward step moves toward the lower rank for black", () => {
+    const white = new Piece("pawn", "fW", hexCtx, HexAxialGeometry, "white");
+    const black = new Piece("pawn", "fW", hexCtx, HexAxialGeometry, "black");
     expect(generateMoves(white, center, center, board)).to.deep.include([
       center,
       center + 1,

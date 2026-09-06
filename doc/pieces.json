@@ -11,38 +11,30 @@
     { "id": "ferz", "betza": "F" },
     { "id": "dabbaba", "betza": "D" },
     { "id": "alfil", "betza": "A" },
-    { "id": "elephant", "betza": "E" },
+    { "id": "elephant", "betza": "FD" },
     { "id": "camel", "betza": "C" },
     { "id": "zebra", "betza": "Z" },
-    { "id": "giraffe", "betza": "G" },
+    { "id": "tripper", "betza": "G" },
+    { "id": "giraffe", "betza": "(4,1)" },
     { "id": "threeleaper", "betza": "H" },
 
-    { "id": "nightrider", "betza": "aN" },
-    { "id": "rookrider", "betza": "aR" },
-    { "id": "bishrider", "betza": "aB" },
-    { "id": "queenrider", "betza": "aQ" },
+    { "id": "nightrider", "betza": "N0" },
+    { "id": "amazon", "betza": "QN" },
+    { "id": "empress", "betza": "RN" },
+    { "id": "princess", "betza": "BN" },
 
-    { "id": "amazon", "betza": "WFN" },
-    { "id": "empress", "betza": "WN" },
-    { "id": "princess", "betza": "FN" },
+    { "id": "cannon", "betza": "mRcpR" },
+    { "id": "pao", "betza": "mRcpR" },
+    { "id": "vao", "betza": "mBcpB" },
+    { "id": "leo", "betza": "mQcpQ" },
 
-    { "id": "cannon", "betza": "jR" },
-    { "id": "pao", "betza": "jR" },
-    { "id": "vao", "betza": "jB" },
-    { "id": "leo", "betza": "jQ" },
+    { "id": "squirrel", "betza": "NAD" },
+    { "id": "mann", "betza": "K" },
 
-    { "id": "squirrel", "betza": "S" },
-    { "id": "mann", "betza": "M" },
-    { "id": "jumping-general", "betza": "J" },
-
-    { "id": "archbishop", "betza": "FN" },
-    { "id": "chancellor", "betza": "WN" },
-
-    { "id": "gryphon", "betza": "FfW" },
-    { "id": "aanca", "betza": "WfF" },
+    { "id": "archbishop", "betza": "BN" },
+    { "id": "chancellor", "betza": "RN" },
 
     { "id": "grasshopper-rook", "betza": "gR" },
-    { "id": "locust-rook", "betza": "hR" },
-    { "id": "dragon", "betza": "aWFN" }
+    { "id": "hook-mover", "betza": "masR" }
   ]
 }

@@ -1,160 +1,77 @@
 import type { MoveAtom } from "../types.js";
 import { expandAtom } from "./expandAtom.js";
 
-const DIRECTION_MODIFIERS = "fblrvs";
+const DIRECTION_MODIFIERS = "fblrvsh";
+type ParsedModifiers = Parameters<typeof expandAtom>[1];
 
-export function parseBetza(x: string): MoveAtom[] {
-  if (x.length === 0) {
-    throw new Error("Empty Betza string");
-  }
+const defaults = (): ParsedModifiers => ({
+  moveOnly: false, captureOnly: false, hopCount: 0,
+  nonJumping: false, mustJump: 0, curved: false, zigzag: false,
+  cylindrical: false, initialOnly: false, enPassantOnly: false, tame: false,
+});
+
+/** Parse the Betza/XBetza language implemented by GNU XBoard 4.8. */
+export function parseBetza(source: string): MoveAtom[] {
+  if (source.length === 0) throw new Error("Empty Betza string");
 
   const atoms: MoveAtom[] = [];
   let i = 0;
+  while (i < source.length) {
+    const legs: ParsedModifiers[] = [defaults()];
+    let leg = legs[0];
 
-  while (i < x.length) {
-    let moveOnly = false;
-    let captureOnly = false;
-    let hopCount = 0;
-
-    let directionalModifiers = "";
-
-    let requiresClearPath = false;
-    let nonJumping = false;
-    let againRider = false;
-    let hopStyle: "cannon" | "grasshopper" | "locust" | undefined = undefined;
-
-    let zigzag = false;
-    let takeAndContinue = false;
-    let unblockable = false;
-    let mustCaptureFirst = false;
-    let mustNotCaptureFirst = false;
-    let captureThenLeap = false;
-
-    while (i < x.length) {
-      const c = x[i];
-
-      if (c === "m") {
-        moveOnly = true;
+    while (i < source.length) {
+      const c = source[i];
+      if (c === "a") { legs.push(defaults()); leg = legs[legs.length - 1]; i++; }
+      else if (c === "m") { leg.moveOnly = true; i++; }
+      else if (c === "c") { leg.captureOnly = true; i++; }
+      else if (c === "n") { leg.nonJumping = true; i++; }
+      else if (c === "j") { leg.mustJump = (leg.mustJump ?? 0) + 1; i++; }
+      else if (c === "p") {
+        if (legs.length > 1 || /^[^A-Z@]*a/.test(source.slice(i + 1))) leg.passThrough = true;
+        else { leg.hopStyle = "cannon"; leg.hopCount = 1; }
         i++;
-        continue;
       }
-      if (c === "c") {
-        captureOnly = true;
-        i++;
-        continue;
+      else if (c === "g") { leg.hopStyle = "grasshopper"; leg.hopCount = 1; i++; }
+      else if (c === "q") { leg.curved = true; i++; }
+      else if (c === "z") { leg.zigzag = true; i++; }
+      else if (c === "o") { leg.cylindrical = true; i++; }
+      else if (c === "i") { leg.initialOnly = true; i++; }
+      else if (c === "e") { leg.enPassantOnly = true; i++; }
+      else if (c === "t") { leg.tame = true; i++; }
+      else if (DIRECTION_MODIFIERS.includes(c)) {
+        leg.directionalModifiers = (leg.directionalModifiers ?? "") + c; i++;
       }
-
-      if (c === "j") {
-        hopCount++;
-        hopStyle = "cannon";
-        i++;
-        continue;
-      }
-      if (c === "g") {
-        hopCount = 1;
-        hopStyle = "grasshopper";
-        i++;
-        continue;
-      }
-      if (c === "h") {
-        hopCount = 1;
-        hopStyle = "locust";
-        i++;
-        continue;
-      }
-
-      if (c === "p") {
-        requiresClearPath = true;
-        i++;
-        continue;
-      }
-      if (c === "n") {
-        nonJumping = true;
-        i++;
-        continue;
-      }
-      if (c === "a") {
-        againRider = true;
-        i++;
-        continue;
-      }
-
-      if (c === "z") {
-        zigzag = true;
-        i++;
-        continue;
-      }
-      if (c === "t") {
-        takeAndContinue = true;
-        i++;
-        continue;
-      }
-      if (c === "u") {
-        unblockable = true;
-        i++;
-        continue;
-      }
-      if (c === "o") {
-        mustCaptureFirst = true;
-        i++;
-        continue;
-      }
-      if (c === "x") {
-        mustNotCaptureFirst = true;
-        i++;
-        continue;
-      }
-      if (c === "y") {
-        captureThenLeap = true;
-        i++;
-        continue;
-      }
-
-      if (DIRECTION_MODIFIERS.includes(c)) {
-        directionalModifiers += c;
-        i++;
-        continue;
-      }
-
-      break;
+      else break;
     }
 
-    if (i >= x.length) {
-      throw new Error("Unexpected end of Betza string");
+    if (i >= source.length) throw new Error("Unexpected end of Betza string");
+    let atom = source[i++];
+    if (atom === "(") {
+      const vector = /^(\d+,\d+)\)/.exec(source.slice(i));
+      if (!vector) throw new Error(`Invalid Betza vector atom at position ${i - 1}`);
+      atom = `(${vector[1]})`;
+      i += vector[0].length;
+    } else if (!/[A-Z@]/.test(atom)) {
+      throw new Error(`Expected a Betza atom at position ${i - 1}, got '${atom}'`);
+    }
+    if (atom === "@") {
+      throw new Error("The XBetza drop atom '@' requires a hand, not a board origin; use a game drop rule");
     }
 
-    const atomChar = x[i];
-    i++;
-
+    const doubled = atom.length === 1 && source[i] === atom;
+    if (doubled) i++;
+    const digits = /^\d+/.exec(source.slice(i));
     let range: number | undefined;
-    const digits = /^\d+/.exec(x.slice(i));
-    if (digits !== null) {
-      range = parseInt(digits[0], 10);
-      if (range < 1) throw new Error(`A range of ${range} is not usable: ${x}`);
-      i += digits[0].length;
-    }
+    if (digits) { range = Number.parseInt(digits[0], 10); i += digits[0].length; }
+    else if (doubled) range = 0;
 
-    const atom = expandAtom(atomChar, {
-      moveOnly,
-      captureOnly,
-      hopCount,
-      directionalModifiers: directionalModifiers || undefined,
-      range,
-      requiresClearPath,
-      nonJumping,
-      againRider,
-      hopStyle,
-
-      zigzag,
-      takeAndContinue,
-      unblockable,
-      mustCaptureFirst,
-      mustNotCaptureFirst,
-      captureThenLeap,
+    const expanded = legs.map((mods, index) => {
+      if (index < legs.length - 1 && !mods.captureOnly && !mods.passThrough) mods.moveOnly = true;
+      return expandAtom(atom, {...mods, range});
     });
-
-    atoms.push(atom);
+    if (expanded.length > 1) expanded[0].continuations = expanded.slice(1);
+    atoms.push(expanded[0]);
   }
-
   return atoms;
 }

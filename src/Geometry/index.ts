@@ -11,6 +11,7 @@ import type { Direction, MoveAtom, Side } from "../types.js";
 import { GeometryContext, Geometry } from "./Geometry.js";
 
 export function classifyGeometry(symbol: string): "slide" | "leap" | "hop" {
+  if (symbol.startsWith("(")) return "leap";
   // Sliding pieces
   if (/^[RBQ]$/.test(symbol)) return "slide";
 
@@ -18,8 +19,8 @@ export function classifyGeometry(symbol: string): "slide" | "leap" | "hop" {
   if (/^[WF]$/.test(symbol)) return "leap";
 
   // Leapers
-  if (/^[NDAECZGHS]$/.test(symbol)) return "leap";
-  if (/^[KMJ]$/.test(symbol)) return "leap";
+  if (/^[NDACZGHU]$/.test(symbol)) return "leap";
+  if (/^[KJL]$/.test(symbol)) return "leap";
 
   // Hoppers
   if (/^[gh]$/.test(symbol)) return "hop";
@@ -59,6 +60,7 @@ export function applyGeometry(
 }
 
 export const DIRECTION_MAP: Record<string, Array<Direction>> = {
+  U: [], // universal leaper; expanded from board dimensions during generation
   // Slides
   R: [
     [1, 0],
@@ -120,16 +122,6 @@ export const DIRECTION_MAP: Record<string, Array<Direction>> = {
     [-2, 2],
     [-2, -2],
   ], // alfil
-  E: [
-    [1, 1],
-    [1, -1],
-    [-1, 1],
-    [-1, -1], // elephant (ferz + dabbaba)
-    [0, 2],
-    [2, 0],
-    [0, -2],
-    [-2, 0],
-  ],
   C: [
     [1, 3],
     [3, 1],
@@ -151,44 +143,18 @@ export const DIRECTION_MAP: Record<string, Array<Direction>> = {
     [-2, 3],
   ],
   G: [
-    [1, 4],
-    [4, 1],
-    [4, -1],
-    [1, -4], // giraffe
-    [-1, -4],
-    [-4, -1],
-    [-4, 1],
-    [-1, 4],
-  ],
+    [3, 3],
+    [3, -3],
+    [-3, 3],
+    [-3, -3],
+  ], // tripper
   H: [
     [0, 3],
     [3, 0],
     [0, -3],
     [-3, 0],
   ], // threeleaper
-  S: [
-    [1, 1],
-    [1, 2],
-    [2, 1],
-    [2, 2], // squirrel (standard fairy definition)
-    [-1, 1],
-    [-1, 2],
-    [-2, 1],
-    [-2, 2],
-    [1, -1],
-    [1, -2],
-    [2, -1],
-    [2, -2],
-    [-1, -1],
-    [-1, -2],
-    [-2, -1],
-    [-2, -2],
-  ],
-
-  // Pawn (forward-only step)
-  P: [[0, 1]],
-
-  // Derived leapers
+  // Derived standard shorthands and historical atom names
   K: [
     [1, 0],
     [-1, 0],
@@ -199,24 +165,12 @@ export const DIRECTION_MAP: Record<string, Array<Direction>> = {
     [-1, 1],
     [-1, -1],
   ],
-  M: [
-    [1, 0],
-    [-1, 0],
-    [0, 1],
-    [0, -1],
-  ],
   J: [
-    [0, 2],
-    [2, 0],
-    [0, -2],
-    [-2, 0],
-    [1, 2],
-    [2, 1],
-    [2, -1],
-    [1, -2],
-    [-1, -2],
-    [-2, -1],
-    [-2, 1],
-    [-1, 2],
+    [1, 3], [3, 1], [3, -1], [1, -3],
+    [-1, -3], [-3, -1], [-3, 1], [-1, 3],
+  ],
+  L: [
+    [2, 3], [3, 2], [3, -2], [2, -3],
+    [-2, -3], [-3, -2], [-3, 2], [-2, 3],
   ],
 };

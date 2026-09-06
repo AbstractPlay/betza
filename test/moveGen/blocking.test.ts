@@ -20,23 +20,11 @@ describe("moveGen – blocking is not a question about capturing", () => {
     expect(from("mR", behindAFriend, 1)).to.deep.equal([0]);
   });
 
-  it("stops a must-not-capture rook (x) in the same place", () => {
-    expect(from("xR", behindAFriend, 1)).to.deep.equal([0]);
+  it("a capture-only rook stops on the first enemy", () => {
+    expect(from("cR", twoEnemies, 2)).to.deep.equal([4]);
   });
 
-  it("gives a must-capture rook (o) nothing behind a friendly piece", () => {
-    expect(from("oR", behindAFriend, 1)).to.deep.equal([]);
-  });
-
-  it("gives a must-capture rook (o) the first enemy and not the second", () => {
-    expect(from("oR", twoEnemies, 2)).to.deep.equal([4]);
-  });
-
-  it("stops a must-not-capture rook (x) short of the first enemy", () => {
-    expect(from("xR", twoEnemies, 2)).to.deep.equal([0, 1, 3]);
-  });
-
-  it("lets a clear-path rook (p) take the piece it runs into", () => {
-    expect(from("pR", twoEnemies, 2)).to.deep.equal(from("R", twoEnemies, 2));
+  it("a cannon hopper crosses exactly one platform", () => {
+    expect(from("pR", twoEnemies, 2)).to.deep.equal([5]);
   });
 });
