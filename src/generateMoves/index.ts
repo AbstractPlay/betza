@@ -26,12 +26,15 @@ export function generateMoves(
 
 function generateAtom(atom: MoveAtom, x: number, y: number, board: BoardState, results: Array<[number, number]>): void {
     if (atom.atom === "U") {
+      if (atom.initialOnly && board.isVirgin?.(x, y) !== true) return;
       for (let ny = 0; ny < board.height; ny++) for (let nx = 0; nx < board.width; nx++) {
         if (nx === x && ny === y) continue;
         const sq = board.get(nx, ny);
         if (!sq || sq.kind === "friendly") continue;
         if (sq.kind === "empty" && atom.captureOnly && !atom.moveOnly) continue;
+        if (sq.kind === "empty" && atom.enPassantOnly && board.isEnPassantTarget?.(nx, ny) !== true) continue;
         if (sq.kind === "enemy" && atom.moveOnly && !atom.captureOnly) continue;
+        if (sq.kind === "enemy" && atom.tame && board.isRoyal?.(nx, ny) === true) continue;
         results.push([nx, ny]);
       }
       return;

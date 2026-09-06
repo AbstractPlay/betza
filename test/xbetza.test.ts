@@ -501,11 +501,24 @@ describe("Betza/XBetza notation", () => {
     expect(generateMoves(new Piece("imW", "imW", squareCtx), 1, 1, board).length).to.be.greaterThan(0);
     expect(generateMoves(new Piece("tcR", "tcR", squareCtx), 1, 1, board)).to.deep.equal([]);
   });
+
+  it("gates the universal leaper through the hooks", () => {
+    const base = boardFromGrid(["...", ".F.", ".E."]);
+    const unmoved = {
+      ...base,
+      get: base.get.bind(base),
+      isVirgin: () => false,
+      isRoyal: (x: number, y: number) => x === 1 && y === 2,
+    };
+    expect(generateMoves(new Piece("U", "U", squareCtx), 1, 1, unmoved)).to.have.length(8);
+    expect(generateMoves(new Piece("iU", "iU", squareCtx), 1, 1, unmoved)).to.deep.equal([]);
+    expect(generateMoves(new Piece("tU", "tU", squareCtx), 1, 1, unmoved)).to.not.deep.include([1, 2]);
+  });
   it("rejects private legacy modifiers instead of silently misreading them", () => {
     for (const notation of ["xR", "uR", "yN"]) {
       expect(() => parseBetza(notation)).to.throw(/Expected a Betza atom/);
     }
-expect(() => parseBetza("O2")).to.throw(/castling atom/);
+    expect(() => parseBetza("O2")).to.throw(/castling atom/);
     expect(() => parseBetza("@")).to.throw(/drop atom/);
   });
 });
