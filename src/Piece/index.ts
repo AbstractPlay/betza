@@ -18,12 +18,12 @@ export class Piece {
    * Parse a Betza string into a geometry-aware piece definition.
    *
    * @param side - Which side the piece belongs to (`"white"` or `"black"`).
-   *   Defaults to `"white"`. Directional atoms (`P`, `fW`, `ffN`, etc.) and
-   *   their move targets depend on this value. Pass `"black"` for black pieces.
+   *   Defaults to `"white"`. Directional expressions (`fW`, `ffN`, etc.) and
+   *   their move targets are resolved relative to this side.
    *
    * @example
    * ```ts
-   * const blackPawn = new Piece("pawn", "P", ctx, SquareRectGeometry, "black");
+   * const blackPawn = new Piece("pawn", "fmWfcF", ctx, SquareRectGeometry, "black");
    * ```
    *
    * Betza strings that encode direction explicitly in modifiers (e.g. `fmWfcF`)
@@ -40,8 +40,20 @@ export class Piece {
     this.betza = betza;
     this.geometry = geometry;
     const normalized = parseBetza(betza);
-    this.atoms = normalized.map((atom) =>
-      applyGeometry(atom, geometry, ctx, side),
-    );
+    const orient = (atom: MoveAtom, continuation = false): MoveAtom => {
+      // Continuation directions are relative to the preceding leg, so keep the
+      // modifier for move generation instead of resolving it against the board.
+      const rawDirections = atom.directionalModifiers;
+      const oriented = applyGeometry(
+        continuation ? {...atom, directionalModifiers: undefined} : atom,
+        geometry, ctx, side,
+      );
+      if (continuation) oriented.directionalModifiers = rawDirections;
+      if (atom.continuations) {
+        oriented.continuations = atom.continuations.map(child => orient(child, true));
+      }
+      return oriented;
+    };
+    this.atoms = normalized.map(atom => orient(atom));
   }
 }

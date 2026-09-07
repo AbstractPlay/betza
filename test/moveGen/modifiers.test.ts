@@ -2,7 +2,7 @@ import "mocha";
 import { expect } from "chai";
 import { Piece } from "../../src/Piece";
 import { parseBetza } from "../../src/Piece/parseBetza";
-import { generateMoves, handleCaptureThenLeap } from "../../src/generateMoves";
+import { generateMoves } from "../../src/generateMoves";
 import { boardFromGrid, squareCtx } from "../helpers";
 import { SquareRectGeometry } from "../../src/Geometry";
 
@@ -32,20 +32,8 @@ describe("moveGen – modifiers", () => {
     expect(moves).to.deep.equal([[1, 2]]);
   });
 
-  it("mustNotCaptureFirst (x) excludes enemy squares on slide", () => {
-    const board = boardFromGrid([
-      "...",
-      ".F.",
-      ".E.",
-      "...",
-    ]);
-    const piece = new Piece("xR", "xR", squareCtx);
-    const moves = generateMoves(piece, 1, 1, board);
-    expect(moves).to.not.deep.include([1, 2]);
-    expect(moves).to.deep.include([1, 0]);
-  });
 
-  it("requiresClearPath (p) stops at first blocker", () => {
+  it("cannon (p) hops the piece in front of it", () => {
     const board = boardFromGrid([
       ".....",
       "..E..",
@@ -55,8 +43,8 @@ describe("moveGen – modifiers", () => {
     ]);
     const piece = new Piece("pR", "pR", squareCtx);
     const moves = generateMoves(piece, 2, 2, board);
-    expect(moves).to.not.deep.include([2, 0]);
-    expect(moves).to.deep.include([2, 3]);
+    expect(moves).to.deep.include([2, 0]);
+    expect(moves).to.not.deep.include([2, 3]);
   });
 
   it("forward-only wazir (fW)", () => {
@@ -187,13 +175,13 @@ describe("moveGen – modifiers", () => {
       ".......",
       ".......",
     ]);
-    const pawn = new Piece("pawn", "P", squareCtx, SquareRectGeometry, "black");
+    const pawn = new Piece("pawn", "fmWfcF", squareCtx, SquareRectGeometry, "black");
     const knight = new Piece("knight", "ffN", squareCtx, SquareRectGeometry, "black");
     expect(generateMoves(pawn, 3, 3, board)).to.deep.equal([[3, 2]]);
     expect(generateMoves(knight, 3, 3, board)).to.have.deep.members([[2, 1], [4, 1]]);
   });
 
-  it("series rider (aN) slides like nightrider", () => {
+  it("nightrider (N0) slides like a rider", () => {
     const board = boardFromGrid([
       "........",
       "........",
@@ -204,7 +192,7 @@ describe("moveGen – modifiers", () => {
       "........",
       "........",
     ]);
-    const piece = new Piece("aN", "aN", squareCtx);
+    const piece = new Piece("N0", "N0", squareCtx);
     const moves = generateMoves(piece, 4, 3, board);
     expect(moves).to.deep.include([6, 4]);
     expect(moves).to.deep.include([5, 5]);
@@ -225,37 +213,9 @@ describe("moveGen – modifiers", () => {
     expect(moves).to.deep.include([3, 5]);
   });
 
-  it("locust rook (hR) requires enemy hurdle and empty landing", () => {
-    const board = boardFromGrid([
-      ".......",
-      ".......",
-      ".......",
-      "...F...",
-      "...E...",
-      ".......",
-      ".......",
-    ]);
-    const piece = new Piece("hR", "hR", squareCtx);
-    const moves = generateMoves(piece, 3, 3, board);
-    expect(moves).to.deep.equal([[3, 5]]);
-  });
 
-  it("locust rejects friendly hurdle", () => {
-    const board = boardFromGrid([
-      ".......",
-      ".......",
-      "...F...",
-      "...F...",
-      ".......",
-      ".......",
-      ".......",
-    ]);
-    const piece = new Piece("hR", "hR", squareCtx);
-    const moves = generateMoves(piece, 3, 2, board);
-    expect(moves).to.deep.equal([]);
-  });
 
-  it("cannon rook (jR) requires exactly one hurdle", () => {
+  it("cannon rook (pR) requires exactly one hurdle", () => {
     const board = boardFromGrid([
       ".......",
       ".......",
@@ -265,7 +225,7 @@ describe("moveGen – modifiers", () => {
       ".......",
       ".......",
     ]);
-    const piece = new Piece("jR", "jR", squareCtx);
+    const piece = new Piece("pR", "pR", squareCtx);
     const moves = generateMoves(piece, 3, 2, board);
     expect(moves).to.deep.include([3, 5]);
     expect(moves).to.not.deep.include([3, 3]);
@@ -296,28 +256,6 @@ describe("parseBetza – negative cases", () => {
   });
 });
 
-describe("handleCaptureThenLeap", () => {
-  it("returns leap targets beyond first enemy on path", () => {
-    const board = boardFromGrid([
-      "........",
-      "........",
-      "........",
-      "...F....",
-      "........",
-      "....E...",
-      "........",
-      "........",
-    ]);
-    const piece = new Piece("yN", "yN", squareCtx);
-    const atom = piece.atoms[0];
-    const path = [
-      { x: 4, y: 5, sq: board.get(4, 5) },
-      { x: 5, y: 5, sq: board.get(5, 5) },
-    ];
-    const result = handleCaptureThenLeap(path, atom, board);
-    expect(result.map((s) => [s.x, s.y])).to.deep.include([5, 7]);
-  });
-});
 
 describe("moveGen – crooked sliders (z)", () => {
   it("alternates between two directions rather than turning the same way", () => {

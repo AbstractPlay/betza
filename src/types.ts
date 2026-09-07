@@ -1,20 +1,6 @@
 export type Direction = [number, number];
 export type Side = "white" | "black";
 
-export interface Modifiers {
-  t?: boolean; // take and continue
-  u?: boolean; // unblockable
-  o?: boolean; // must capture first
-  x?: boolean; // must not capture first
-  y?: boolean; // capture then leap
-  p?: boolean; // requires clear path
-  z?: boolean; // zig-zag
-  g?: boolean; // grasshopper movement
-  h?: boolean; // locust movement
-  m?: boolean; // move only
-  c?: boolean; // capture only
-}
-
 export type MoveAtom = {
   atom: string; // atom letter, before modifiers
   kind: "leap" | "slide" | "hop";
@@ -23,24 +9,25 @@ export type MoveAtom = {
   deltasConcrete?: ReadonlyArray<{ df: number; dr: number }>;
   maxSteps: number; // ∞ for slides, 1 for leaps, 1 for hops
 
-  hopCount: number; // 0 = normal, 1 = grasshopper/locust, >1 = cannon
-  hopStyle?: "cannon" | "grasshopper" | "locust";
+  hopCount: number; // number of occupied platforms which must be crossed
+  hopStyle?: "cannon" | "grasshopper";
 
   moveOnly: boolean; // m
   captureOnly: boolean; // c
 
-  directionalModifiers?: string; // f/b/l/r/v/s
+  directionalModifiers?: string; // f/b/l/r/v/s/h
 
-  requiresClearPath: boolean; // p
   nonJumping?: boolean; // n
-  againRider: boolean; // a
+  mustJump?: number; // j/jj
 
+  curved?: boolean; // q
   zigzag?: boolean; // z
-  takeAndContinue?: boolean; // t
-  unblockable?: boolean; // u
-  mustCaptureFirst?: boolean; // o
-  mustNotCaptureFirst?: boolean; // x
-  captureThenLeap?: boolean; // y
+  cylindrical?: boolean; // o
+  initialOnly?: boolean; // i
+  enPassantOnly?: boolean; // e
+  tame?: boolean; // t
+  continuations?: MoveAtom[]; // a
+  passThrough?: boolean; // p on a non-final leg
 };
 
 export type SquareKind = "empty" | "friendly" | "enemy";
@@ -53,7 +40,13 @@ export type SquareState = {
 export type BoardState = {
   width: number;
   height: number;
+  /** Treat the corresponding coordinate axis as cyclic for every atom. */
+  wrapFiles?: boolean;
+  wrapRanks?: boolean;
   get(x: number, y: number): SquareState | undefined;
+  isVirgin?(x: number, y: number): boolean;
+  isEnPassantTarget?(x: number, y: number): boolean;
+  isRoyal?(x: number, y: number): boolean;
 };
 
 export type PathSquare = {

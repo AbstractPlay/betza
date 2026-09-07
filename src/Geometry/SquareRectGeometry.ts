@@ -61,8 +61,18 @@ export const SquareRectGeometry: Geometry = {
   },
 
   selectDirections(deltas, modifiers) {
-    const straight = readDirectionGroups(modifiers, false);
-    const skewed = readDirectionGroups(modifiers, true);
+    // XBetza's h combines with f/b into a full half-plane, while hr/hl
+    // select the two chiral halves of an oblique atom.
+    if ((modifiers === "hr" || modifiers === "hl") && deltas.some(isOblique)) {
+      const rightHanded = modifiers === "hr";
+      return deltas.filter(({df, dr}) => {
+        const chirality = Math.sign(df * dr) * (Math.abs(dr) > Math.abs(df) ? 1 : -1);
+        return rightHanded ? chirality > 0 : chirality < 0;
+      });
+    }
+    const directions = modifiers.replace(/([fb])h/g, "$1");
+    const straight = readDirectionGroups(directions, false);
+    const skewed = readDirectionGroups(directions, true);
     if (straight.length === 0) return deltas;
     return deltas.filter((delta) => {
       const groups = isDiagonal(delta) || isOblique(delta) ? skewed : straight;

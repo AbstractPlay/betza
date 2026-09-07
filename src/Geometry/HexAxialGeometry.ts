@@ -42,11 +42,8 @@ export const HexAxialGeometry: Geometry = {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   atomDeltas(atom, canonical, ctx) {
     switch (atom) {
-      case "P":
-        return [{ df: 0, dr: 1 }];
       case "R":
       case "W":
-      case "M":
         return rook;
       case "B":
       case "F":
@@ -62,10 +59,6 @@ export const HexAxialGeometry: Geometry = {
         return scale(bishop, 2);
       case "H":
         return scale(rook, 3);
-      case "E":
-        return [...bishop, ...scale(rook, 2)];
-      case "J":
-        return [...scale(rook, 2), ...knight];
       default:
         throw new Error(
           `The '${atom}' Betza atom is not defined for axial hex geometry.`,

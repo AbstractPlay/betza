@@ -40,7 +40,7 @@ console.log(moves);
 
 ## Piece orientation (white vs black)
 
-The `Piece` constructor accepts an optional fifth argument, `side` (`"white"` | `"black"`, default `"white"`). Directional atoms and modifiers (`P`, `fW`, `ffN`, etc.) are oriented relative to this side.
+The `Piece` constructor accepts an optional fifth argument, `side` (`"white"` | `"black"`, default `"white"`). Directional modifiers (`fW`, `ffN`, etc.) are oriented relative to this side.
 
 ```ts
 import { Piece, RectBoard, SquareRectGeometry } from "@abstractplay/betza";
@@ -48,8 +48,8 @@ import { Piece, RectBoard, SquareRectGeometry } from "@abstractplay/betza";
 const board = new RectBoard(["........", "........", "....F...", "........", "........", "........", "........", "........"]);
 const ctx = board.geometryContext;
 
-const whitePawn = new Piece("pawn", "P", ctx, SquareRectGeometry, "white");
-const blackPawn = new Piece("pawn", "P", ctx, SquareRectGeometry, "black");
+const whitePawn = new Piece("pawn", "fmWfcF", ctx, SquareRectGeometry, "white");
+const blackPawn = new Piece("pawn", "fmWfcF", ctx, SquareRectGeometry, "black");
 ```
 
 If your Betza string already encodes direction in modifiers (e.g. `fmWfcF` for a pawn), you may not need to pass `side`. The `Side` type is exported from the package for typing.
@@ -103,7 +103,7 @@ import { Piece, HexAxialGeometry } from "@abstractplay/betza";
 const rook = new Piece("sqrook", "R");
 const rookHex = new Piece("hexrook", "R", {boardWidth: 20, boardHeight: 20}, HexAxialGeometry);
 const grasshopper = new Piece("grasshopper", "gR");
-const hexTakeAndContinueRook = new Piece("hextrrook", "tR", {boardWidth: 20, boardHeight: 20}, HexAxialGeometry);
+const hookMover = new Piece("hook", "masR", {boardWidth: 20, boardHeight: 20});
 ```
 
 By default the `Piece` constructor assumes an 8x8 chessboard. But you can override this by passing at least an appropriate context and a custom geometry if necessary. The library includes the basic square/rect and hex axial geometries.
@@ -148,7 +148,7 @@ const board = new RectBoard([
     "........",
     "........",
 ]);
-const piece = new Piece("trrook", "tR"); // take-and-continue rook on standard 8x8 chessboard
+const piece = new Piece("rook", "R");
 const moves = generateMoves(piece, 4, 4, board);
 console.log(moves);
 // -> [ [ 5, 4 ], [ 6, 4 ], [ 7, 4 ], [ 3, 4 ], [ 2, 4 ], [ 1, 4 ], [ 0, 4 ], [ 4, 5 ], [ 4, 6 ], [ 4, 7 ], [ 4, 3 ], [ 4, 2 ], [ 4, 1 ], [ 4, 0 ] ]
@@ -165,73 +165,50 @@ console.log(moves);
 | A    | Alfil         | (2,2)                | Leaper          |
 | C    | Camel         | (3,1)                | Leaper          |
 | Z    | Zebra         | (3,2)                | Leaper          |
-| G    | Giraffe       | (1,4)                | Leaper          |
+| G    | Tripper       | (3,3)                | Leaper          |
 | H    | Threeleaper   | (3,0)                | Leaper          |
-| E    | Elephant      | F + D                | Leaper          |
-| S    | Squirrel      | mixed 1–2 squares    | Leaper          |
-| P    | Pawn          | (0,1)                | Leaper          |
+| (x,y) | Explicit vector | any nonzero vector | Leaper          |
+| U    | Universal leaper | every other square | Leaper          |
 | R    | Rook          | W‑rider              | Rider           |
 | B    | Bishop        | F‑rider              | Rider           |
 | Q    | Queen         | R + B                | Rider           |
 | K    | King          | W + F                | Derived Leaper  |
-| M    | Mann          | W                    | Derived Leaper  |
-| J    | Jumping Gen.  | D + N                | Derived Leaper  |
+| J / L | Historical camel / zebra spellings | (3,1) / (3,2) | Leaper |
 
-Series riders use the `a` prefix (e.g. `aN` nightrider, or again-rider).
+Unlimited riders use the zero range (`N0`). The older doubled atom (`NN`) is
+also accepted. Use explicit vectors for unnamed atoms, for example `(4,1)` for a
+giraffe and `(4,1)0` for its rider.
 
 ## Supported Modifiers
 
 | Modifier | Meaning                |
 |----------|------------------------|
-| t        | take and continue      |
-| u        | unblockable            |
-| o        | must capture first     |
-| x        | must not capture first |
-| y        | capture then leap      |
-| p        | requires clear path    |
-| n        | blockable leap         |
-| z        | zig‑zag                |
-| g        | grasshopper movement   |
-| h        | locust movement        |
-| j        | cannon (hurdle count)  |
-| a        | series rider           |
-| f/b/l/r/v/s | directional restrict |
-| m        | move only              |
-| c        | capture only           |
+| i        | only for pieces that haven't moved |
+| m / c / e | move / capture / en-passant modality |
+| n / j    | non-jumping / must-jump path |
+| p / g    | cannon / grasshopper movement |
+| q / z    | curved / zig-zag rider |
+| o        | cylindrical movement   |
+| t        | cannot capture royal pieces |
+| a        | another move leg       |
+| f/b/l/r/v/s/h | directional restriction |
 
 Modifiers can be combined:
 
 ```ts
-parseBetza("tuR"); // unblockable take-and-continue rook
-parseBetza("yN");  // capture-then-leap knight
-parseBetza("pgB"); // clear-path grasshopper bishop
+parseBetza("mRcpR"); // Xiangqi cannon
+parseBetza("masR");  // two perpendicular rook legs (hook mover)
+parseBetza("fcafmF"); // checker capture: capture, then continue forward
 ```
 
-## Atom × Modifier Compatibility Matrix
+## Stateful and game-level notation
 
-| Modifier                   | Leapers (W,F,N,…)  | Riders (R,B,Q) | Hoppers (g,h) | Notes  |
-|----------------------------|--------------------|----------------|---------------|--------|
-| t (take & continue) | ✔️ | ✔️ | — | Leapers continue sliding after capture |
-| u (unblockable) | ✔️ | ✔️ | — | Passes through blockers on slides |
-| o (must capture first) | ✔️ | ✔️ | ✔️ | Applies to any move with a capture option |
-| x (must not capture first) | ✔️ | ✔️ | ✔️ | Same as above, inverted |
-| y (capture then leap) | ✔️ | ✔️ | ✔️ | Per-ray on slides |
-| p (requires clear path) | ✔️ | ✔️ | ✔️ | All intervening squares must be empty |
-| n (blockable leap) | ✔️ | — | — | Stopped by anything on the squares the leap passes over; invalid on slides/hops throws at parse time |
-| z (zig‑zag) | — | ✔️ | — | Alternates direction each step; square boards only |
-| g (grasshopper movement) | — | — | ✔️ | Converts atom into hopper |
-| h (locust movement) | — | — | ✔️ | Enemy hurdle, empty landing beyond |
-| j (cannon) | ✔️ | ✔️ | ✔️ | Requires exact hurdle count on path |
-| a (series rider) | ✔️ | ✔️ | — | Riderizes leaper atoms |
-| f/b/l/r/v/s (directional) | ✔️ | ✔️ | ✔️ | Half-plane / quadrant on square and hex; oblique narrowing (`ffN`, `fsN`) square boards only |
-| m (move‑only) | ✔️ | ✔️ | ✔️ | Universal |
-| c (capture‑only) | ✔️ | ✔️ | ✔️ | Universal |
+`i`, `e`, and `t` use the optional `BoardState.isVirgin`, `isEnPassantTarget`,
+and `isRoyal` hooks. Without `isVirgin` or `isEnPassantTarget`, the `i` and `e`
+moves are unavailable; without `isRoyal`, the `t` restriction has no effect.
 
-Legend:
-
-- ✔️ fully supported
-- ⚠️ conditionally meaningful (depends on range, hop, or capture rules)
-- — not meaningful for that atom type
+The drop atom `@` and the castling atom `O` need a hand and a move history, so
+`parseBetza` rejects both. Handle them in your game rules.
 
 ## Documentation
 
