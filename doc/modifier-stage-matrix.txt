@@ -1,13 +1,25 @@
                 GEOM   FILTER   CAPTURE   CONTINUE   LAND
 ------------------------------------------------------------
-t (take&cont)     ·       ·        ·        ✔         ·
-u (unblockable)   ·       ·        ·        ✔         ·
-o (must cap)      ·       ✔        ✔         ·        ✔
-x (no cap)        ·       ✔        ✔         ·        ✔
-y (cap→leap)      ·       ·        ✔        ✔         ✔
-p (clear path)    ·       ✔        ·         ·        ·
-z (zig‑zag)       ✔       ·        ·         ·        ·
-g (grasshopper)   ✔       ·        ✔         ·        ✔
-h (locust)        ✔       ·        ✔         ·        ✔
+i (virgin)        ·       ·        ·         ·        ✔
 m (move only)     ·       ✔        ✔         ·        ✔
 c (capture only)  ·       ✔        ✔         ·        ✔
+e (en passant)    ·       ✔        ✔         ·        ✔
+n (non-jumping)   ·       ✔        ·         ·        ·
+j (must-jump)     ·       ✔        ·         ·        ·
+p (cannon)        ·       ✔        ✔         ·        ✔
+g (grasshopper)   ✔       ·        ✔         ·        ✔
+q (curved)        ✔       ·        ·         ·        ·
+z (zig-zag)       ✔       ·        ·         ·        ·
+o (cylindrical)   ✔       ·        ·         ·        ·
+t (tame)          ·       ·        ✔         ·        ✔
+a (continuation)  ·       ·        ·        ✔         ✔
+f/b/l/r/v/s/h     ✔       ·        ·         ·        ·
+
+Legend:
+  GEOM      — ray or delta construction (slides, hops, direction filter)
+  FILTER    — path or leap filtering (blocking, hurdles, modality)
+  CAPTURE   — capture legality (m/c/e/t)
+  CONTINUE  — multi-leg `a` chains and pass-through `p` platforms
+  LAND      — final destination rules
+
+Not implemented in coordinate-only move generation: `@` (drop), `O` (castling).

@@ -59,6 +59,10 @@ export const HexAxialGeometry: Geometry = {
         return scale(bishop, 2);
       case "H":
         return scale(rook, 3);
+      case "U":
+        throw new Error(
+          "The universal leaper 'U' is not supported on axial hex geometry; use an explicit vector atom instead.",
+        );
       default:
         throw new Error(
           `The '${atom}' Betza atom is not defined for axial hex geometry.`,

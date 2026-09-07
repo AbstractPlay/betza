@@ -11,6 +11,12 @@ describe("HexAxialGeometry", () => {
         {df: -1, dr: 0}, {df: 0, dr: -1}, {df: 1, dr: -1},
       ]);
     });
+
+    it("rejects the universal leaper U", () => {
+      expect(() => HexAxialGeometry.atomDeltas("U", [], hexCtx)).to.throw(
+        /universal leaper 'U'/,
+      );
+    });
   });
 
   describe("applyDelta", () => {

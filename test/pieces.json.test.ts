@@ -31,7 +31,8 @@ describe("doc/pieces.json", () => {
     it(`${entry.id} (${entry.betza}) generates moves from center`, () => {
       const piece = new Piece(entry.id, entry.betza, emptyBoard8.geometryContext);
       const moves = generateMoves(piece, 4, 4, emptyBoard8);
-      const needsHurdle = /^[jgh]/.test(entry.betza);
+      // Grasshopper atoms need a hurdle; cannons paired with m-slides still move.
+      const needsHurdle = /^g/.test(entry.betza);
       if (needsHurdle) {
         expect(moves).to.be.an("array");
       } else {

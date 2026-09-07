@@ -1,46 +1,39 @@
 GEOMETRY
 ────────
-z   → zig‑zag (alternate deltas)
-g   → hopper ray
-h   → locust ray
-y   → second‑leap geometry (after capture)
+q   → curved rider (turn each step)
+z   → zig-zag rider (alternate deltas)
+g   → grasshopper hop ray
+p   → cannon hurdle filter on slides
+o   → cylindrical file wrap (or board wrapFiles/wrapRanks)
+f/b/l/r/v/s/h → direction filter (square and hex)
+U   → every other square on square/rect boards only
 
 ANNOTATION
 ──────────
-(no modifiers act here)
+(board squares tagged empty / friendly / enemy)
 
 PATH FILTERING
 ──────────────
-p   → stop at first non‑empty (clear path)
-o   → remove empties before first capture
-x   → remove enemy squares
-c   → remove empty squares
-m   → remove enemy squares
+n   → leap path must be clear (lame leaper)
+j   → leap/slide must pass over ≥N occupied squares
+p   → cannon: landing squares need exactly hopCount hurdles
+g   → grasshopper: hurdle then landing beyond
 
 CAPTURE LOGIC
 ─────────────
-o   → must capture first
-x   → must not capture first
-c   → capture only
-m   → move only
-y   → must capture first (to trigger leap)
-g   → capture on landing
-h   → capture on hurdle
+m   → empty destinations only
+c   → enemy destinations only
+e   → empty destinations that are en-passant targets (needs hook)
+t   → skip royal enemy destinations (needs isRoyal hook)
+i   → entire atom unavailable unless isVirgin hook is true
 
 CONTINUATION
 ────────────
-t   → continue sliding after capture
-u   → ignore blockers (continue past enemy/friendly)
-y   → continuation is a leap, not a slide
-g   → no continuation
-h   → no continuation
+a   → another move leg; non-final legs default to move-only
+p   → on a non-final leg, pass through to first blocker as platform
 
 LANDING RULES
 ─────────────
-o   → landing must be capture
-x   → landing must be empty
-c   → landing must be enemy
-m   → landing must be empty
-y   → landing must obey move/capture rules
-g   → landing must obey move/capture rules
-h   → landing is always capture
+m/c → combined m+c allows both empty and enemy
+e   → empty landing must be en-passant target
+t   → enemy landing rejected when isRoyal is true

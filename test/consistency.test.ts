@@ -7,17 +7,14 @@ function mods(extra = {}) {
     moveOnly: false,
     captureOnly: false,
     hopCount: 0,
-
-    requiresClearPath: false,
-    againRider: false,
-    hopStyle: undefined,
-
+    nonJumping: false,
+    mustJump: 0,
+    curved: false,
     zigzag: false,
-    takeAndContinue: false,
-    unblockable: false,
-    mustCaptureFirst: false,
-    mustNotCaptureFirst: false,
-    captureThenLeap: false,
+    cylindrical: false,
+    initialOnly: false,
+    enPassantOnly: false,
+    tame: false,
 
     ...extra
   };
